@@ -10,7 +10,7 @@ dependencies:
   - name: postgresql
     version: 11.0.2
     repository: https://charts.bitnami.com/bitnami
-    condition: postgreqsl.enabled
+    condition: postgresql.enabled
   - name: kafka
     version: 15.1.0
     repository: https://charts.bitnami.com/bitnami
