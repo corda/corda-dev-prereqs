@@ -1,0 +1,46 @@
+{{- if .Values.postgresql.enabled }}
+apiVersion: v1
+kind: Pod
+metadata:
+  name: "{{ .Release.Name }}-postgresql-connection-test"
+  annotations:
+    "helm.sh/hook": test
+spec:
+  containers:
+    - name: {{ .Release.Name }}-postgresql-connection-test
+      image: {{ include "postgresql.image" .Subcharts.postgresql }}
+      imagePullPolicy: {{ .Values.postgresql.image.pullPolicy | quote }}
+      {{- if .Values.postgresql.primary.containerSecurityContext.enabled }}
+      securityContext:
+        runAsUser: {{ .Values.postgresql.primary.containerSecurityContext.runAsUser }}
+      {{- end }}
+      env:
+        - name: PGPASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "postgresql.secretName" .Subcharts.postgresql }}
+              key: postgres-password
+        - name: PGSSLMODE
+          value: "verify-full"
+        - name: PGSSLROOTCERT
+          value: /certs/ca.crt
+      volumeMounts:
+        - mountPath: "/certs"
+          name: certs
+          readOnly: true
+      command:
+        - psql
+        - --host
+        - {{ include "postgresql.primary.fullname" .Subcharts.postgresql }}
+        - -U
+        - "postgres"
+        - -d
+        - {{- if include "postgresql.database" .Subcharts.postgresql }} {{ include "postgresql.database" .Subcharts.postgresql }}{{- else }} postgres{{- end }}
+        - -p
+        - {{ include "postgresql.service.port" .Subcharts.postgresql | quote }}
+  volumes:
+    - name: certs
+      secret:
+        secretName: {{ printf "%s-crt" (include "common.names.fullname" .Subcharts.postgresql ) }}
+  restartPolicy: Never
+{{- end }}
