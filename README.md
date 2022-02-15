@@ -4,5 +4,10 @@ Contains a Helm chart for the deployment of PostgreSQL and Kafka, secured with T
 
 Install with:
 ```
-helm upgrade --install --render-subchart-notes prereqs .
+helm upgrade --install --render-subchart-notes --wait prereqs .
+```
+
+After installation, you can verify that a successful TLS connection can be made to PostgreSQL with:
+```
+helm test prereqs
 ```
