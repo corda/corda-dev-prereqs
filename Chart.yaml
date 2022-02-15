@@ -1,0 +1,17 @@
+apiVersion: v2
+name: corda-prereqs
+description: A Helm chart for installing Corda 5 prerequisites
+
+type: application
+version: 0.1.0
+appVersion: "5.0.0"
+
+dependencies:
+  - name: postgresql
+    version: 11.0.2
+    repository: https://charts.bitnami.com/bitnami
+    condition: postgreqsl.enabled
+  - name: kafka
+    version: 15.1.0
+    repository: https://charts.bitnami.com/bitnami
+    condition: kafka.enabled
