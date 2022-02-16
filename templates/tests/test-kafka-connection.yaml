@@ -1,0 +1,37 @@
+{{- if .Values.kafka.enabled }}
+apiVersion: v1
+kind: Pod
+metadata:
+  name: "{{ .Release.Name }}-kafka-connection-test"
+  annotations:
+    "helm.sh/hook": test
+spec:
+  containers:
+    - name: {{ .Release.Name }}-kafka-connection-test
+      image: {{ include "kafka.image" .Subcharts.kafka }}
+      imagePullPolicy: {{ .Values.kafka.image.pullPolicy | quote }}
+      {{- if .Values.kafka.containerSecurityContext.enabled }}
+      securityContext:
+        runAsUser: {{ .Values.kafka.containerSecurityContext.runAsUser }}
+      {{- end }}
+      volumeMounts:
+        - mountPath: "/certs"
+          name: certs
+          readOnly: true
+      command:
+        - kafka-topics.sh
+        - --list
+        - --bootstrap-server
+        - {{ include "common.names.fullname" .Subcharts.kafka }}:{{ .Values.kafka.service.ports.client }}
+        - --command-config
+        - /tmp/config.properties
+      lifecycle:
+        postStart:
+          exec:
+            command: ["/bin/sh", "-c", "echo \"security.protocol=SSL\nssl.truststore.type=PEM\nssl.truststore.location=/certs/ca.crt\" > /tmp/config.properties"]
+  volumes:
+    - name: certs
+      secret:
+        secretName: {{ printf "%s-0-tls" (include "common.names.fullname" .Subcharts.kafka) }}
+  restartPolicy: Never
+{{- end }}
