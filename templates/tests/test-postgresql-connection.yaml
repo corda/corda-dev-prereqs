@@ -5,6 +5,7 @@ metadata:
   name: "{{ .Release.Name }}-postgresql-connection-test"
   annotations:
     "helm.sh/hook": test
+    "helm.sh/hook-delete-policy": hook-succeeded
 spec:
   containers:
     - name: {{ .Release.Name }}-postgresql-connection-test
