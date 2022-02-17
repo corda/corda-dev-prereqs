@@ -34,5 +34,8 @@ spec:
     - name: certs
       secret:
         secretName: {{ printf "%s-0-tls" (include "common.names.fullname" .Subcharts.kafka) }}
+        items:
+          - key: ca.crt
+            path: ca.crt
   restartPolicy: Never
 {{- end }}
