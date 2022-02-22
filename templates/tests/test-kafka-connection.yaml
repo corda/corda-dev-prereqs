@@ -5,7 +5,7 @@ metadata:
   name: "{{ .Release.Name }}-kafka-connection-test"
   annotations:
     "helm.sh/hook": test
-    "helm.sh/hook-delete-policy": hook-succeeded
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
 spec:
   containers:
     - name: {{ .Release.Name }}-kafka-connection-test
@@ -15,21 +15,28 @@ spec:
       securityContext:
         runAsUser: {{ .Values.kafka.containerSecurityContext.runAsUser }}
       {{- end }}
+      {{- if eq .Values.kafka.auth.clientProtocol "tls" }}
       volumeMounts:
         - mountPath: "/certs"
           name: certs
           readOnly: true
+      {{- end }}
       command:
         - kafka-topics.sh
         - --list
         - --bootstrap-server
         - {{ include "common.names.fullname" .Subcharts.kafka }}:{{ .Values.kafka.service.ports.client }}
+        {{- if eq .Values.kafka.auth.clientProtocol "tls" }}
         - --command-config
         - /tmp/config.properties
+        {{- end }}
+      {{- if eq .Values.kafka.auth.clientProtocol "tls" }}
       lifecycle:
         postStart:
           exec:
             command: ["/bin/sh", "-c", "echo \"security.protocol=SSL\nssl.truststore.type=PEM\nssl.truststore.location=/certs/ca.crt\" > /tmp/config.properties"]
+      {{- end }}
+  {{- if eq .Values.kafka.auth.clientProtocol "tls" }}
   volumes:
     - name: certs
       secret:
@@ -37,5 +44,6 @@ spec:
         items:
           - key: ca.crt
             path: ca.crt
+  {{- end }}
   restartPolicy: Never
 {{- end }}
