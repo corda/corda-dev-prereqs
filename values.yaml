@@ -33,11 +33,21 @@ postgresql:
     enabled: true
   # auth configuration.
   auth:
-    # -- disable the "postgres" super user.
-    enablePostgresUser: false
     # -- name of database to be created.
     database: cordacluster
     # -- name of the user to be created.
     username: user
     # -- name of the password of the user to be created.
     password: pass
+  primary:
+    initdb:
+      scripts:
+        corda_user_init.sh: |
+          export PGPASSFILE=/tmp/pgpasswd$$
+          touch $PGPASSFILE
+          chmod 600 $PGPASSFILE
+          trap "rm $PGPASSFILE" EXIT
+          echo "localhost:${POSTGRES_PORT_NUMBER:-5432}:$POSTGRESQL_DATABASE:postgres:$POSTGRES_POSTGRES_PASSWORD" > $PGPASSFILE
+          psql -v ON_ERROR_STOP=1 cordacluster <<-EOF
+            ALTER ROLE "$POSTGRES_USER" NOSUPERUSER CREATEDB CREATEROLE INHERIT LOGIN;
+          EOF
