@@ -39,8 +39,12 @@ postgresql:
     username: user
     # -- name of the password of the user to be created.
     password: pass
+  # primary (read/write instance) configuration.
   primary:
+    # Custom init configuration..
     initdb:
+      # -- ConfigMap-like object containing scripts to be executed on startup.
+      # @default -- corda_user_init.sh
       scripts:
         corda_user_init.sh: |
           export PGPASSFILE=/tmp/pgpasswd$$

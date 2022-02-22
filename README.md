@@ -24,9 +24,9 @@ A Helm chart for installing Corda 5 prerequisites
 | kafka.replicaCount | int | `3` | set a static replica count of kafka brokers. |
 | kafka.zookeeper.replicaCount | int | `3` | set a static replica count of zookeeper nodes. |
 | postgresql.auth.database | string | `"cordacluster"` | name of database to be created. |
-| postgresql.auth.enablePostgresUser | bool | `false` | disable the "postgres" super user. |
 | postgresql.auth.password | string | `"pass"` | name of the password of the user to be created. |
 | postgresql.auth.username | string | `"user"` | name of the user to be created. |
 | postgresql.enabled | bool | `true` | enable/disable postgres. |
+| postgresql.primary.initdb.scripts | object | corda_user_init.sh | ConfigMap-like object containing scripts to be executed on startup. |
 | postgresql.volumePermissions.enabled | bool | `true` | enable/disable an init container which changes ownership of the mounted volumes. |
 

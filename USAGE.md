@@ -42,3 +42,33 @@ After the release has been installed, it may be tested via the following command
 ```shell
 helm test "<RELEASE NAME>" -n "<RELEASE NAMESPACE>"
 ```
+
+### Maintaining
+
+As new value fields are added to the default [values.yaml](values.yaml) - doc strings should be included.
+
+for objects prefer this style:
+```yaml
+# Doc string on an object, which won't show in README.md
+foo: {}
+```
+
+Whereas for primitive types prefer this style:
+```yaml
+# -- Doc string for a primitive, which will show in the README.md
+foo: "bar"
+```
+
+Then using [helm-docs](https://github.com/norwoodj/helm-docs)
+
+Generate the README.md via:
+
+```shell
+$ helm-docs
+INFO[2022-02-22T18:13:16Z] Found Chart directories [.]
+INFO[2022-02-22T18:13:16Z] Generating README Documentation for chart /mnt/c/src/poc-corda-prereqs-helm
+```
+
+NOTE:
+We should explore other tools, such as bitnami's [readme-generator](https://github.com/bitnami-labs/readme-generator-for-helm) as well as integrate into either
+a CI pipeline (ie. github actions) or precommit hooks.
