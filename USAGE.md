@@ -1,6 +1,6 @@
 # Overview
 
-This document intends to overview how to the helm chart in this repository.
+This document intends to overview how to use the helm chart in this repository.
 
 It corresponds with [README.md](README.md) which is auto-generated from docstrings, detailing configurable values.
 
