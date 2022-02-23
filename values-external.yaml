@@ -1,0 +1,12 @@
+# Additional values file to decorate kafka with extra-cluster listeners.
+kafka:
+  auth:
+    externalClientProtocol: ssl
+  externalAccess:
+    enabled: true
+    service:
+      type: NodePort
+      nodePorts:
+        - 30000
+        - 30001
+        - 30002
