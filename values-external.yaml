@@ -10,3 +10,10 @@ kafka:
         - 30000
         - 30001
         - 30002
+
+postgresql:
+  primary:
+    service:
+      type: NodePort
+      nodePorts:
+        - 30100
