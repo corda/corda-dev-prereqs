@@ -1,1 +1,1 @@
-Installing prerequisites.
+Corda 5 Pre-requisites have been installed.

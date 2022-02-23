@@ -5,7 +5,7 @@ metadata:
   name: "{{ .Release.Name }}-postgresql-connection-test"
   annotations:
     "helm.sh/hook": test
-    "helm.sh/hook-delete-policy": hook-succeeded
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
 spec:
   containers:
     - name: {{ .Release.Name }}-postgresql-connection-test
@@ -20,25 +20,34 @@ spec:
           valueFrom:
             secretKeyRef:
               name: {{ include "postgresql.secretName" .Subcharts.postgresql }}
-              key: postgres-password
+              key: {{- if eq (include "postgresql.username" .Subcharts.postgresql) nil }}
+                postgres-password
+              {{- else }}
+                password
+              {{- end }}
+        {{- if eq .Values.postgresql.tls.enabled true }}
         - name: PGSSLMODE
           value: "verify-full"
         - name: PGSSLROOTCERT
           value: /certs/ca.crt
+        {{- end }}
+      {{- if eq .Values.postgresql.tls.enabled true }}
       volumeMounts:
         - mountPath: "/certs"
           name: certs
           readOnly: true
+      {{- end }}
       command:
         - psql
         - --host
         - {{ include "postgresql.primary.fullname" .Subcharts.postgresql }}
         - -U
-        - "postgres"
+        -  {{ include "postgresql.username" .Subcharts.postgresql | default "postgres" }}
         - -d
-        - {{- if include "postgresql.database" .Subcharts.postgresql }} {{ include "postgresql.database" .Subcharts.postgresql }}{{- else }} postgres{{- end }}
+        - {{ include "postgresql.database" .Subcharts.postgresql | default "postgres" }}
         - -p
         - {{ include "postgresql.service.port" .Subcharts.postgresql | quote }}
+  {{- if eq .Values.postgresql.tls.enabled true }}
   volumes:
     - name: certs
       secret:
@@ -46,5 +55,6 @@ spec:
         items:
           - key: ca.crt
             path: ca.crt
+  {{- end }}
   restartPolicy: Never
 {{- end }}
