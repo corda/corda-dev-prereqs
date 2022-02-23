@@ -6,6 +6,10 @@ kafka:
     enabled: true
     service:
       type: LoadBalancer
+      loadBalancerIPs:
+        - 127.0.0.1
+        - 127.0.0.1
+        - 127.0.0.1
 
 postgresql:
   primary:
