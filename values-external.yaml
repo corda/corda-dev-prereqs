@@ -5,13 +5,15 @@ kafka:
   externalAccess:
     enabled: true
     service:
-      type: LoadBalancer
-      loadBalancerIPs:
-        - 127.0.0.1
-        - 127.0.0.1
-        - 127.0.0.1
+      type: NodePort
+      nodePorts:
+        - 30000
+        - 30001
+        - 30002
 
 postgresql:
   primary:
     service:
-      type: LoadBalancer
+      type: NodePort
+      nodePorts:
+        postgresql: 30100

@@ -55,24 +55,7 @@ It may be used by appending the following options, to the `helm upgrade` command
 -f values.yaml -f values-external.yaml
 ```
 
-This will create a LoadBalancer type service for each Kafka Broker and Database.
-
-Connection details may be determined via:
-
-```shell
-kubectl -n "<RELEASE NAMESPACE>" get svc
-```
-
-Then using the `EXTERNAL-IP` column or  `.status.loadBalancer.ingress[0].hostname` field to determine the IP
-address to connect to.
-As well as the `.spec.ports[0].port` field to determine the port.
-
-NOTE: When running locally, your Kubernetes provider may not provision load balancers by default, and you may need
-to run an additional command - or install [metallb](https://metallb.universe.tf/).
-
-For example:
-- minikube: https://minikube.sigs.k8s.io/docs/commands/tunnel/
-- kind: https://kind.sigs.k8s.io/docs/user/loadbalancer/
+This will create a NodePort type service for each Kafka Broker and Database.
 
 ### Maintaining
 
