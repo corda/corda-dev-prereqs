@@ -45,8 +45,9 @@ helm test "<RELEASE NAME>" -n "<RELEASE NAMESPACE>"
 
 #### Optionally externalise services
 
-As an alternative to port-forwarding services, a non-default [values-external.yaml](values-external.yaml) has been crafted - intended to decorate
-the existing [values.yaml](values.yaml) to expose Kafka brokers and Postgresql via NodePort services.
+As an alternative to port-forwarding services, a non-default [values-external.yaml](values-external.yaml)
+has been crafted - intended to decorate the existing [values.yaml](values.yaml) to expose Kafka brokers
+and Postgresql via NodePort services.
 
 It may be used by appending the following options, to the `helm upgrade` command:
 
@@ -62,12 +63,12 @@ Connection details may be determined via:
 kubectl -n "<RELEASE NAMESPACE>" get svc
 ```
 
-Then using the `EXTERNAL-IP` column or  `.status.loadBalancer.ingress[0].hostname` field to determine the IP address to
-connect to.
+Then using the `EXTERNAL-IP` column or  `.status.loadBalancer.ingress[0].hostname` field to determine the IP
+address to connect to.
 As well as the `.spec.ports[0].port` field to determine the port.
 
-NOTE: When running locally, your Kubernetes provider may not provision load balancers by default, and you may need to
-run an additional command - or install [metallb](https://metallb.universe.tf/).
+NOTE: When running locally, your Kubernetes provider may not provision load balancers by default, and you may need
+to run an additional command - or install [metallb](https://metallb.universe.tf/).
 
 For example:
 - minikube: https://minikube.sigs.k8s.io/docs/commands/tunnel/
