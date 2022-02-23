@@ -1,4 +1,4 @@
-# Additional values file to decorate kafka with extra-cluster listeners.
+# Additional values file to externalize components via NodePort services.
 kafka:
   auth:
     externalClientProtocol: tls
