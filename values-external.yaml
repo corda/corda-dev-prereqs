@@ -1,7 +1,7 @@
 # Additional values file to decorate kafka with extra-cluster listeners.
 kafka:
   auth:
-    externalClientProtocol: ssl
+    externalClientProtocol: tls
   externalAccess:
     enabled: true
     service:
@@ -16,4 +16,4 @@ postgresql:
     service:
       type: NodePort
       nodePorts:
-        - 30100
+        postgresql: 30100

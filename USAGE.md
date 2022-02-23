@@ -43,6 +43,26 @@ After the release has been installed, it may be tested via the following command
 helm test "<RELEASE NAME>" -n "<RELEASE NAMESPACE>"
 ```
 
+#### Optionally externalise services
+
+As an alternative to port-forwarding services, a non-default [values-external.yaml](values-external.yaml) has been crafted - intended to decorate
+the existing [values.yaml](values.yaml) to expose Kafka brokers and Postgresql via NodePort services.
+
+It may be used by appending the following options, to the `helm upgrade` command:
+
+```shell
+-f values.yaml -f values-external.yaml
+```
+
+This will create NodePort services for each Kafka Broker and Postgresql databases. Available on the following mappings:
+
+- Kafka-0 -> 30000
+- Kafka-1 -> 30001
+- Kafka-2 -> 30002
+
+
+- Postgres (primary) -> 30100
+
 ### Maintaining
 
 As new value fields are added to the default [values.yaml](values.yaml) - doc strings should be included.
