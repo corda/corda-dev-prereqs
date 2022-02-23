@@ -54,14 +54,24 @@ It may be used by appending the following options, to the `helm upgrade` command
 -f values.yaml -f values-external.yaml
 ```
 
-This will create NodePort services for each Kafka Broker and Postgresql databases. Available on the following mappings:
+This will create a LoadBalancer type service for each Kafka Broker and Database.
 
-- Kafka-0 -> 30000
-- Kafka-1 -> 30001
-- Kafka-2 -> 30002
+Connection details may be determined via:
 
+```shell
+kubectl -n "<RELEASE NAMESPACE>" get svc
+```
 
-- Postgres (primary) -> 30100
+Then using the `EXTERNAL-IP` column or  `.status.loadBalancer.ingress[0].hostname` field to determine the IP address to
+connect to.
+As well as the `.spec.ports[0].port` field to determine the port.
+
+NOTE: When running locally, your Kubernetes provider may not provision load balancers by default, and you may need to
+run an additional command - or install [metallb](https://metallb.universe.tf/).
+
+For example:
+- minikube: https://minikube.sigs.k8s.io/docs/commands/tunnel/
+- kind: https://kind.sigs.k8s.io/docs/user/loadbalancer/
 
 ### Maintaining
 
