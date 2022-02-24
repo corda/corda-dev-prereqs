@@ -20,10 +20,10 @@ spec:
           valueFrom:
             secretKeyRef:
               name: {{ include "postgresql.secretName" .Subcharts.postgresql }}
-              key: {{- if eq (include "postgresql.username" .Subcharts.postgresql) nil }}
-                postgres-password
-              {{- else }}
+              key: {{- if (include "postgresql.username" .Subcharts.postgresql) }}
                 password
+              {{- else }}
+                postgres-password
               {{- end }}
         {{- if eq .Values.postgresql.tls.enabled true }}
         - name: PGSSLMODE
