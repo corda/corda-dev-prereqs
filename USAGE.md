@@ -52,10 +52,19 @@ and Postgresql via NodePort services.
 It may be used by appending the following options, to the `helm upgrade` command:
 
 ```shell
--f values.yaml -f values-external.yaml
+-f values-external.yaml
 ```
 
 This will create a NodePort type service for each Kafka Broker and Database.
+
+These services are available on the following ports:
+
+- Kafka-0 -> 30000
+- Kafka-1 -> 30001
+- Kafka-2 -> 30002
+
+
+- Postgres -> 30100
 
 ### Maintaining
 
