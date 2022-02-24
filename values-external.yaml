@@ -1,0 +1,19 @@
+# Additional values file to externalize components via NodePort services.
+kafka:
+  auth:
+    externalClientProtocol: tls
+  externalAccess:
+    enabled: true
+    service:
+      type: NodePort
+      nodePorts:
+        - 30000
+        - 30001
+        - 30002
+
+postgresql:
+  primary:
+    service:
+      type: NodePort
+      nodePorts:
+        postgresql: 30100
