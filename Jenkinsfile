@@ -21,6 +21,8 @@ pipeline {
         CORDA_REVISION = "${env.GIT_COMMIT}"
         NAMESPACE = "run-${UUID.randomUUID().toString()}"
         CLUSTER_NAME = "eks-e2e.e2e.awsdev.r3.com"
+        HELM_REPOSITORY_CONFIG = "/tmp/helm-config"
+        HELM_REPOSITORY_CACHE = "/tmp/helm-cache"
     }
 
     options {
