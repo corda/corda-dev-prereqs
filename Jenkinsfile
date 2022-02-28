@@ -1,3 +1,12 @@
+def chartVersion() {
+    def chartVersion = sh(script:'helm show chart charts/corda-prereqs | sed -n \'s/^version: \\(.*\\)$/\\1/p\'', returnStdout: true).trim()
+    if (env.BRANCH_NAME == 'main') {
+        return $chartVersion
+    } else {
+        return "$chartVersion-${env.BRANCH_NAME}"
+    }
+}
+
 pipeline {
     agent {
         docker {
@@ -15,6 +24,7 @@ pipeline {
     environment {
         KUBECONFIG = credentials("e2e-tests-credentials")
         CORDA_REVISION = "${env.GIT_COMMIT}"
+        CHART_VERSION = chartVersion()
         NAMESPACE = "run-${UUID.randomUUID().toString()}"
         CLUSTER_NAME = "eks-e2e.e2e.awsdev.r3.com"
         HELM_REPOSITORY_CONFIG = "/tmp/helm/repositories.yaml"
@@ -53,7 +63,7 @@ pipeline {
         stage('Package') {
             steps {
                 sh '''
-                    helm package charts/corda-prereqs
+                    helm package charts/corda-prereqs --version $CHART_VERSION
                 '''
             }
         }
@@ -62,7 +72,7 @@ pipeline {
                 withCredentials([usernamePassword(credentialsId: 'artifactory-credentials', passwordVariable: 'PASSWORD', usernameVariable: 'USER')]) {
                     sh '''
                         echo $PASSWORD | helm registry login corda-os-docker-dev.software.r3.com -u $USER --password-stdin
-                        helm push corda-prereqs-*.tgz oci://corda-os-docker-dev.software.r3.com/helm-charts
+                        helm push corda-prereqs-$CHART_VERSION.tgz oci://corda-os-docker-dev.software.r3.com/helm-charts
                     '''
                 }
             }
