@@ -71,9 +71,15 @@ pipeline {
             steps {
                 sh '''
                     helm install prereqs corda-prereqs-$CHART_VERSION.tgz -n $NAMESPACE --create-namespace --wait
-                    helm test prereqs
-                    kubectl delete namespace $NAMESPACE
+                    helm test prereqs -n $NAMESPACE
                 '''
+            }
+            post {
+                always {
+                    sh '''
+                        kubectl delete namespace $NAMESPACE
+                    '''
+                }
             }
         }
         stage('Publish') {
