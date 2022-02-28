@@ -67,6 +67,15 @@ pipeline {
                 '''
             }
         }
+        stage('Test') {
+            steps {
+                sh '''
+                    helm install prereqs corda-prereqs-$CHART_VERSION.tgz -n $NAMESPACE --create-namespace --wait
+                    helm test prereqs
+                    kubectl delete namespace $NAMESPACE
+                '''
+            }
+        }
         stage('Publish') {
             steps {
                 withCredentials([usernamePassword(credentialsId: 'artifactory-credentials', passwordVariable: 'PASSWORD', usernameVariable: 'USER')]) {
