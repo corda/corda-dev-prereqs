@@ -1,7 +1,7 @@
 def chartVersion() {
     def chartVersion = sh(script:'helm show chart charts/corda-prereqs | sed -n \'s/^version: \\(.*\\)$/\\1/p\'', returnStdout: true).trim()
     if (env.BRANCH_NAME == 'main') {
-        return $chartVersion
+        return "$chartVersion"
     } else {
         return "$chartVersion-${env.BRANCH_NAME}"
     }
