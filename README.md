@@ -3,7 +3,16 @@
 The contents of this repository can be used to install the Kafka and PostgreSQL pre-requisites for Corda 5.
 The auto-generated [charts/corda-prereqs/README.md](README.md) contains details of the configurable values.
 
-## Installation
+## Installation from Artifactory
+
+The chart is packaged and published as an OCI bundle to an Artifactory Docker registry. This can be installed as follows:
+
+```shell
+helm registry login corda-os-docker.software.r3.com -u $CORDA_ARTIFACTORY_USERNAME -p $CORDA_ARTIFACTORY_PASSWORD 
+helm upgrade --install prereqs oci://corda-os-docker.software.r3.com/helm-charts/corda-prereqs --render-subchart-notes 
+```
+
+## Installation from source
 
 Assuming [helm](https://helm.sh/) with a version greater than 3.7 is installed, the chart may be used a follows.
 
