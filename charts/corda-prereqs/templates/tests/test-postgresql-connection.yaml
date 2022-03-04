@@ -7,6 +7,7 @@ metadata:
     "helm.sh/hook": test
     "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
 spec:
+  {{- include "postgresql.imagePullSecrets" .Subcharts.postgresql | nindent 2 }}
   containers:
     - name: {{ .Release.Name }}-postgresql-connection-test
       image: {{ include "postgresql.image" .Subcharts.postgresql }}
