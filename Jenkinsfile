@@ -15,7 +15,7 @@ pipeline {
             registryUrl 'https://engineering-docker.software.r3.com/'
             registryCredentialsId 'artifactory-credentials'
             // Used to mount storage from the host as a volume to persist the cache between builds
-            args '-v /tmp/helm/repository:/host_tmp/helm-cache'
+            args '-v /tmp:/host_tmp'
             // make sure build image is always fresh
             alwaysPull true
         }
@@ -28,7 +28,7 @@ pipeline {
         NAMESPACE = "run-${UUID.randomUUID().toString()}"
         CLUSTER_NAME = "eks-e2e.e2e.awsdev.r3.com"
         HELM_REPOSITORY_CONFIG = "/tmp/helm/repositories.yaml"
-        HELM_REPOSITORY_CACHE = "/tmp/helm/repository"
+        HELM_REPOSITORY_CACHE = "/host_tmp/helm/repository"
         HELM_REGISTRY_CONFIG = "/tmp/helm/registry/config.json"
     }
 

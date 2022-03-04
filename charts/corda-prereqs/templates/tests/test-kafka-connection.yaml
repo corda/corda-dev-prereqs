@@ -7,6 +7,7 @@ metadata:
     "helm.sh/hook": test
     "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
 spec:
+  {{- include "kafka.imagePullSecrets" .Subcharts.kafka | nindent 2 }}
   containers:
     - name: {{ .Release.Name }}-kafka-connection-test
       image: {{ include "kafka.image" .Subcharts.kafka }}
