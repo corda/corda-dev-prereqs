@@ -6,6 +6,8 @@ kafka:
   allowPlaintextListener: true
   # -- set a static replica count of kafka brokers.
   replicaCount: 3
+  # -- enable/disable auto-creation of topics.
+  autoCreateTopicsEnable: false
   # authentication configuration.
   auth:
     # -- protocol of the client listener.
