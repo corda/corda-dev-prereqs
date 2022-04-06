@@ -57,3 +57,17 @@ postgresql:
           psql -v ON_ERROR_STOP=1 cordacluster <<-EOF
             ALTER ROLE "$POSTGRES_USER" NOSUPERUSER CREATEDB CREATEROLE INHERIT LOGIN;
           EOF
+    # Custom resource configuration
+    resources:
+      # -- Guaranteed resources for primary containers.
+      request:
+        # -- Default memory for the PostgreSQL Primary containers.
+        memory: 256Mi
+        # -- Default requested cpu for the PostgreSQL Primary containers.
+        cpu: 250m
+      # -- Resource limits for PostgreSQL primary containers.
+      limits:  
+        # -- Default memory limit for PostgreSQL primary containers.
+        memory: 520mi
+        # -- Default cpu limit for PostgreSQL primary containers.
+        cpu: 500m
