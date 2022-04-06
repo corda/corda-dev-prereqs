@@ -24,6 +24,20 @@ kafka:
   zookeeper:
     # -- set a static replica count of zookeeper nodes.
     replicaCount: 3
+  # resource configuration
+  resources:
+    # -- requested resources for Kafka containers.
+    requests:
+      # -- requested memory for Kafka containers.
+      memory: 390Mi
+      # -- requested cpu for kafka containers.
+      cpu: 1000m
+    # --resource limits for kafka containers.
+    limits:
+      # --memory limit for kafka containers.
+      memory: 700Mi
+      # --cpu limit for kafka containers.
+      cpu: 1000m
 
 # values for configuring bitnami/postgres sub-chart.
 postgresql:
@@ -67,7 +81,7 @@ postgresql:
         cpu: 250m
       # -- Resource limits for PostgreSQL primary containers.
       limits:  
-        # -- Default memory limit for PostgreSQL primary containers.
+        # -- memory limit for PostgreSQL primary containers.
         memory: 520mi
-        # -- Default cpu limit for PostgreSQL primary containers.
+        # -- cpu limit for PostgreSQL primary containers.
         cpu: 500m
