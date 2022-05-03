@@ -1,16 +1,7 @@
-# Corda Pre-requisites Helm chart
+# Corda 5 Development Pre-requisites Helm chart
 
-The contents of this repository can be used to install the Kafka and PostgreSQL pre-requisites for Corda 5.
-The auto-generated [charts/corda-prereqs/README.md](README.md) contains details of the configurable values.
-
-## Installation from Artifactory
-
-The chart is packaged and published as an OCI bundle to an Artifactory Docker registry. This can be installed as follows:
-
-```shell
-helm registry login corda-os-docker.software.r3.com -u $CORDA_ARTIFACTORY_USERNAME -p $CORDA_ARTIFACTORY_PASSWORD 
-helm upgrade --install prereqs oci://corda-os-docker.software.r3.com/helm-charts/corda-prereqs --render-subchart-notes 
-```
+The contents of this repository can be used to install the Kafka and PostgreSQL pre-requisites for Corda 5 development.
+The auto-generated [charts/corda-dev/README.md](README.md) contains details of the configurable values.
 
 ## Installation from source
 
@@ -18,27 +9,26 @@ Assuming [helm](https://helm.sh/) with a version greater than 3.7 is installed, 
 
 ### Download dependencies
 
-Dependencies are included in [charts/corda-prereqs/Chart.yaml](Chart.yaml) and [charts/corda-prereqs/Chart.lock](Chart.lock).
+Dependencies are included in [charts/corda-dev/Chart.yaml](Chart.yaml) and [charts/corda-dev/Chart.lock](Chart.lock).
 
-NOTE: Before proceeding ensure that all unique repositories declared in [charts/corda-prereqs/Chart.yaml](Chart.yaml) 
+NOTE: Before proceeding ensure that all unique repositories declared in [charts/corda-dev/Chart.yaml](Chart.yaml) 
 have been added via `helm repo add`
 ie.
 ```shell
-# TODO: Could automate this further with xargs + helm repo add... ie. helm repo add bitnami charts.bitnami...
-helm dep ls charts/corda-prereqs | awk 'NR>1 && NF > 1' | cut -f 3 | sort -u
+helm dep ls charts/corda-dev | awk 'NR>1 && NF > 1' | cut -f 3 | sort -u
 ```
 
 To download these to the required directory, issue the following command:
 
 ```shell
-helm dep build charts/corda-prereqs
+helm dep build charts/corda-dev
 ```
 
 ### Install helm chart
 
 To install the helm chart with the default values run the following command:
 ```shell
-helm upgrade -i "<RELEASE NAME>" charts/corda-prereqs --namespace "<RELEASE NAMESPACE>" --create-namespace --wait
+helm upgrade -i "<RELEASE NAME>" charts/corda-dev --namespace "<RELEASE NAMESPACE>" --create-namespace --wait
 ```
 
 Optionally use the `--render-subchart-notes` for a brief overview of all connection details.
@@ -76,7 +66,7 @@ These services are available on the following ports:
 
 ### Maintaining
 
-As new value fields are added to the default [charts/corda-prereqs/values.yaml](values.yaml) - doc strings should be included.
+As new value fields are added to the default [charts/corda-dev/values.yaml](values.yaml) - doc strings should be included.
 
 For objects prefer this style:
 ```yaml
@@ -96,10 +86,10 @@ Generate the README.md via:
 
 ```shell
 $ helm-docs
-INFO[2022-02-22T18:13:16Z] Found Chart directories [charts/corda-prereqs]
-INFO[2022-02-22T18:13:16Z] Generating README Documentation for chart /mnt/c/src/poc-corda-prereqs-helm/charts/corda-prereqs
+INFO[2022-02-22T18:13:16Z] Found Chart directories [charts/corda-dev]
+INFO[2022-02-22T18:13:16Z] Generating README Documentation for chart /mnt/c/src/corda-dev-helm/charts/corda-dev
 ```
 
 NOTE:
-We should explore other tools, such as bitnami's [readme-generator](https://github.com/bitnami-labs/readme-generator-for-helm) as well as integrate into either
+We should explore other tools, such as Bitnami's [readme-generator](https://github.com/bitnami-labs/readme-generator-for-helm) as well as integrate into either
 a CI pipeline (ie. github actions) or precommit hooks.

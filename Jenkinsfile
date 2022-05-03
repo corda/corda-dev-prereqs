@@ -1,5 +1,5 @@
 def chartVersion() {
-    def chartVersion = sh(script:'helm show chart charts/corda-prereqs | sed -n \'s/^version: \\(.*\\)$/\\1/p\'', returnStdout: true).trim()
+    def chartVersion = sh(script:'helm show chart charts/corda-dev | sed -n \'s/^version: \\(.*\\)$/\\1/p\'', returnStdout: true).trim()
     if (env.BRANCH_NAME == 'main') {
         return "$chartVersion"
     } else {
@@ -49,28 +49,28 @@ pipeline {
         stage('Build dependencies') {
             steps {
                 sh '''
-                    helm dependency build charts/corda-prereqs
+                    helm dependency build charts/corda-dev
                 '''
             }
         }
         stage('Lint') {
             steps {
                 sh '''
-                    helm lint charts/corda-prereqs
+                    helm lint charts/corda-dev
                 '''
             }
         }
         stage('Package') {
             steps {
                 sh '''
-                    helm package charts/corda-prereqs --version $CHART_VERSION
+                    helm package charts/corda-dev --version $CHART_VERSION
                 '''
             }
         }
         stage('Test') {
             steps {
                 sh '''
-                    helm install prereqs corda-prereqs-$CHART_VERSION.tgz -n $NAMESPACE --create-namespace --wait
+                    helm install prereqs corda-dev-$CHART_VERSION.tgz -n $NAMESPACE --create-namespace --wait
                     helm test prereqs -n $NAMESPACE
                 '''
             }
@@ -87,7 +87,7 @@ pipeline {
                 withCredentials([usernamePassword(credentialsId: 'artifactory-credentials', passwordVariable: 'PASSWORD', usernameVariable: 'USER')]) {
                     sh '''
                         echo $PASSWORD | helm registry login corda-os-docker-dev.software.r3.com -u $USER --password-stdin
-                        helm push corda-prereqs-$CHART_VERSION.tgz oci://corda-os-docker-dev.software.r3.com/helm-charts
+                        helm push corda-dev-$CHART_VERSION.tgz oci://corda-os-docker-dev.software.r3.com/helm-charts
                     '''
                 }
             }
