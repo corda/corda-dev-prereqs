@@ -39,8 +39,8 @@ postgresql:
     database: cordacluster
     # -- name of the user to be created.
     username: user
-    # -- name of the password of the user to be created.
-    password: pass
+    # -- name of the password of the user to be created - defaults to generated value
+    password:
   # primary (read/write instance) configuration.
   primary:
     # Custom init configuration..
