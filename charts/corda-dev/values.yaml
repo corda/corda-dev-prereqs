@@ -11,7 +11,7 @@ kafka:
   # authentication configuration.
   auth:
     # -- protocol of the client listener.
-    clientProtocol: plaintext
+    clientProtocol: tls
     # -- protocol of the interbroker listener used for replication.
     interBrokerProtocol: tls
     # tls configuration.
