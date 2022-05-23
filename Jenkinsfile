@@ -3,7 +3,7 @@ def chartVersion() {
     if (env.BRANCH_NAME == 'main') {
         return "$chartVersion"
     } else {
-        return "$chartVersion/${env.BRANCH_NAME}"
+        return "$chartVersion-*${env.BRANCH_NAME}"
     }
 }
 
