@@ -5,7 +5,7 @@ kafka:
   # -- enable plaintext as a listener protocol.
   allowPlaintextListener: true
   # -- set a static replica count of kafka brokers.
-  replicaCount: 3
+  replicaCount: 1
   # -- enable/disable auto-creation of topics.
   autoCreateTopicsEnable: false
   # authentication configuration.
@@ -23,7 +23,7 @@ kafka:
   # values configuring bitnami/zookeeper dependency of bitnami/kafka.
   zookeeper:
     # -- set a static replica count of zookeeper nodes.
-    replicaCount: 3
+    replicaCount: 1
 
 # values for configuring bitnami/postgres sub-chart.
 postgresql:
