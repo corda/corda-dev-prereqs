@@ -35,7 +35,7 @@ spec:
       lifecycle:
         postStart:
           exec:
-            command: ["/bin/sh", "-c", "echo \"security.protocol=SSL\nssl.truststore.type=PEM\nssl.truststore.location=/certs/ca.crt\" > /tmp/config.properties"]
+            command: ["/bin/sh", "-c", "echo \"security.protocol={{ Values.kafka.auth.clientProtocol }}\nssl.truststore.type=PEM\nssl.truststore.location=/certs/ca.crt\nsasl.jaas.config=org.apache.kafka.common.security.scram.ScramLoginModule required username=user password={{ .Values.kafka.auth.sasl.jaas.clientPasswords }};" > /tmp/config.properties"]
       {{- end }}
   {{- if eq .Values.kafka.auth.clientProtocol "tls" }}
   volumes:
