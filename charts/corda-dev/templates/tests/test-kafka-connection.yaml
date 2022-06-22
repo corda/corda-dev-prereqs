@@ -16,7 +16,7 @@ spec:
       securityContext:
         runAsUser: {{ .Values.kafka.containerSecurityContext.runAsUser }}
       {{- end }}
-      {{- if eq .Values.kafka.auth.clientProtocol "tls" }}
+      {{- if eq .Values.kafka.auth.clientProtocol "sasl_tls" }}
       volumeMounts:
         - mountPath: "/certs"
           name: certs
@@ -27,11 +27,11 @@ spec:
         - --list
         - --bootstrap-server
         - {{ include "common.names.fullname" .Subcharts.kafka }}:{{ .Values.kafka.service.ports.client }}
-        {{- if eq .Values.kafka.auth.clientProtocol "tls" }}
+        {{- if eq .Values.kafka.auth.clientProtocol "sasl_tls" }}
         - --command-config
         - /tmp/config.properties
         {{- end }}
-      {{- if eq .Values.kafka.auth.clientProtocol "tls" }}
+      {{- if eq .Values.kafka.auth.clientProtocol "sasl_tls" }}
       lifecycle:
         postStart:
           exec:
