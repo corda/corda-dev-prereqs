@@ -39,9 +39,9 @@ spec:
             {{- end }}
             {{- if or (eq .Values.kafka.auth.clientProtocol "sasl_tls") (eq .Values.kafka.auth.clientProtocol "tls")  }}
             echo "ssl.truststore.location=/certs/ca.crt" >> /tmp/config.properties
-            echo "ssl.truststore.type={{ .Values.kafka.auth.tls.truststore.type | upper }}" >> /tmp/config.properties
-            {{- if .Values.kafka.tls.truststore.password }}
-            echo "ssl.truststore.password={{ .Values.kafka.auth.tls.truststore.password }}" >> /tmp/config.properties
+            echo "ssl.truststore.type={{ .Values.kafka.auth.tls.type | upper }}" >> /tmp/config.properties
+            {{- if .Values.kafka.auth.tls.password }}
+            echo "ssl.truststore.password={{ .Values.kafka.auth.tls.password }}" >> /tmp/config.properties
             {{- end }}
             {{- end }}
             {{- if or (eq .Values.kafka.auth.clientProtocol "sasl_tls") (eq .Values.kafka.auth.clientProtocol "sasl")  }}
