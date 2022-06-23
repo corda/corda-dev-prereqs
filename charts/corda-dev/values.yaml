@@ -12,6 +12,12 @@ kafka:
   auth:
     # -- protocol of the client listener.
     clientProtocol: tls
+    # -- sasl configuration.
+    sasl:
+      # -- Java Authentication and Authorization Service
+      jaas:
+        # -- client password to  Authenticate with kafka
+        clientPasswords: [admin-secret]   
     # -- protocol of the interbroker listener used for replication.
     interBrokerProtocol: tls
     # tls configuration.

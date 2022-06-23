@@ -16,28 +16,47 @@ spec:
       securityContext:
         runAsUser: {{ .Values.kafka.containerSecurityContext.runAsUser }}
       {{- end }}
-      {{- if eq .Values.kafka.auth.clientProtocol "tls" }}
+      {{- if or (eq .Values.kafka.auth.clientProtocol "sasl_tls") (eq .Values.kafka.auth.clientProtocol "tls")  }}
       volumeMounts:
         - mountPath: "/certs"
           name: certs
           readOnly: true
       {{- end }}
       command:
-        - kafka-topics.sh
-        - --list
-        - --bootstrap-server
-        - {{ include "common.names.fullname" .Subcharts.kafka }}:{{ .Values.kafka.service.ports.client }}
-        {{- if eq .Values.kafka.auth.clientProtocol "tls" }}
-        - --command-config
-        - /tmp/config.properties
-        {{- end }}
-      {{- if eq .Values.kafka.auth.clientProtocol "tls" }}
-      lifecycle:
-        postStart:
-          exec:
-            command: ["/bin/sh", "-c", "echo \"security.protocol=SSL\nssl.truststore.type=PEM\nssl.truststore.location=/certs/ca.crt\" > /tmp/config.properties"]
-      {{- end }}
-  {{- if eq .Values.kafka.auth.clientProtocol "tls" }}
+        - bash
+        - -c
+      args:
+        - |
+            touch /tmp/config.properties
+            {{- if eq .Values.kafka.auth.clientProtocol "sasl_tls" }}
+            echo "security.protocol=SASL_SSL" >> /tmp/config.properties
+            {{- end }}
+            {{- if eq .Values.kafka.auth.clientProtocol "tls" }}
+            echo "security.protocol=SSL" >> /tmp/config.properties
+            {{- end }}
+            {{- if eq .Values.kafka.auth.clientProtocol "sasl" }}
+            echo "security.protocol=SASL_PLAINTEXT" >> /tmp/config.properties
+            {{- end }}
+            {{- if or (eq .Values.kafka.auth.clientProtocol "sasl_tls") (eq .Values.kafka.auth.clientProtocol "tls")  }}
+            echo "ssl.truststore.location=/certs/ca.crt" >> /tmp/config.properties
+            echo "ssl.truststore.type={{ .Values.kafka.auth.tls.type | upper }}" >> /tmp/config.properties
+            {{- if .Values.kafka.auth.tls.password }}
+            echo "ssl.truststore.password={{ .Values.kafka.auth.tls.password }}" >> /tmp/config.properties
+            {{- end }}
+            {{- end }}
+            {{- if or (eq .Values.kafka.auth.clientProtocol "sasl_tls") (eq .Values.kafka.auth.clientProtocol "sasl")  }}
+            {{- if .Values.kafka.auth.sasl.mechanisms | regexFind "scram-sha-256" }}
+            echo "sasl.mechanism=SCRAM-SHA-256" >> /tmp/config.properties
+            {{- else if .Values.kafka.auth.sasl.mechanisms | regexFind "scram-sha-512" }}
+            echo "sasl.mechanism=SCRAM-SHA-512" >> /tmp/config.properties
+            {{- else }}
+            echo "sasl.mechanism=PLAIN" >> /tmp/config.properties
+            {{- end }}
+            echo "sasl.jaas.config=org.apache.kafka.common.security.scram.ScramLoginModule required username=\"{{ first .Values.kafka.auth.sasl.jaas.clientUsers }}\" password=\"{{ first .Values.kafka.auth.sasl.jaas.clientPasswords }}\";">> /tmp/config.properties
+            {{- end }}
+            cat /tmp/config.properties
+            kafka-topics.sh --list --bootstrap-server {{ include "common.names.fullname" .Subcharts.kafka }}:{{ .Values.kafka.service.ports.client }} --command-config /tmp/config.properties
+  {{- if or (eq .Values.kafka.auth.clientProtocol "sasl_tls") (eq .Values.kafka.auth.clientProtocol "tls")  }}
   volumes:
     - name: certs
       secret:
