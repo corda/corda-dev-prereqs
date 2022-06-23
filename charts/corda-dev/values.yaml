@@ -11,7 +11,7 @@ kafka:
   # authentication configuration.
   auth:
     # -- protocol of the client listener.
-    clientProtocol: sasl_tls
+    clientProtocol: tls
     # -- sasl configuration.
     sasl:
       # -- Java Authentication and Authorization Service
