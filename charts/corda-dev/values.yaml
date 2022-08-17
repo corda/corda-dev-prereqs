@@ -62,4 +62,5 @@ postgresql:
           echo "localhost:${POSTGRES_PORT_NUMBER:-5432}:$POSTGRESQL_DATABASE:postgres:$POSTGRES_POSTGRES_PASSWORD" > $PGPASSFILE
           psql -v ON_ERROR_STOP=1 cordacluster <<-EOF
             ALTER ROLE "$POSTGRES_USER" NOSUPERUSER CREATEDB CREATEROLE INHERIT LOGIN;
+            ALTER system SET max_connections = 1000;
           EOF
