@@ -2,6 +2,9 @@
 kafka:
   # -- enable/disable kafka.
   enabled: true
+  # Configuring Kafka image
+  image:
+    tag: 3.2.0-debian-11-r20
   # -- enable plaintext as a listener protocol.
   allowPlaintextListener: true
   # -- set a static replica count of kafka brokers.
@@ -35,6 +38,9 @@ kafka:
 postgresql:
   # -- enable/disable postgres.
   enabled: true
+  # Configuring PostgreSQL image
+  image:
+    tag: 14.4.0-debian-11-r23
   # values configuring the permissions of volumes.
   volumePermissions:
     # -- enable/disable an init container which changes ownership of the mounted volumes.
