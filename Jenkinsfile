@@ -7,7 +7,7 @@ def chartVersion() {
     }
 }
 
-pipeline {
+pipeline { 
     agent {
         docker {
             image 'build-zulu-openjdk:11'
