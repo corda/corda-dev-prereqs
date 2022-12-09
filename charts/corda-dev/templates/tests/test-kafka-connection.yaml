@@ -52,10 +52,18 @@ spec:
             {{- else }}
             echo "sasl.mechanism=PLAIN" >> /tmp/config.properties
             {{- end }}
-            echo "sasl.jaas.config=org.apache.kafka.common.security.scram.ScramLoginModule required username=\"{{ first .Values.kafka.auth.sasl.jaas.clientUsers }}\" password=\"{{ first .Values.kafka.auth.sasl.jaas.clientPasswords }}\";">> /tmp/config.properties
+            echo "sasl.jaas.config=org.apache.kafka.common.security.scram.ScramLoginModule required username=\"{{ first .Values.kafka.auth.sasl.jaas.clientUsers }}\" password=\"${KAFKA_SASL_PASSWORDS%%,*}\";">> /tmp/config.properties
             {{- end }}
             cat /tmp/config.properties
             kafka-topics.sh --list --bootstrap-server {{ include "common.names.fullname" .Subcharts.kafka }}:{{ .Values.kafka.service.ports.client }} --command-config /tmp/config.properties
+      {{- if or (eq .Values.kafka.auth.clientProtocol "sasl_tls") (eq .Values.kafka.auth.clientProtocol "sasl")  }}
+      env:
+        - name: KAFKA_SASL_PASSWORDS
+          valueFrom:
+            secretKeyRef:
+              name: {{ printf "%s-jaas" (include "common.names.fullname" .Subcharts.kafka) }}
+              key: "client-passwords"
+      {{- end }}
   {{- if or (eq .Values.kafka.auth.clientProtocol "sasl_tls") (eq .Values.kafka.auth.clientProtocol "tls")  }}
   volumes:
     - name: certs
