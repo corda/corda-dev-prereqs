@@ -24,6 +24,39 @@ If release name contains chart name it will be used as a full name.
 {{- end }}
 
 {{/*
+Name for PostgreSQL related resources.
+*/}}
+{{- define "corda-dev.postgresName" -}}
+{{ printf "%s-postgres" ( .Release.Name | trunc 54 | trimSuffix "-" ) }}
+{{- end }}
+
+{{/*
+Name for Kafka related resources.
+*/}}
+{{- define "corda-dev.kafkaName" -}}
+{{ printf "%s-kafka" ( .Release.Name | trunc 54 | trimSuffix "-" ) }}
+{{- end }}
+
+{{/*
+PostgreSQL probe command.
+*/}}
+{{- define "corda-dev.postgresProbe" -}}
+exec:
+  command:
+    - /bin/sh
+    - -c
+    - exec pg_isready -U postgres -d "sslcert=/certs/server.crt sslkey=/certs/server.key" -h 127.0.0.1 -p 5432
+{{- end }}
+
+{{/*
+Kafka probe command.
+*/}}
+{{- define "corda-dev.kafkaProbe" -}}
+tcpSocket:
+  port: kafka
+{{- end }}
+
+{{/*
 Create chart name and version as used by the chart label.
 */}}
 {{- define "corda-dev.chart" -}}

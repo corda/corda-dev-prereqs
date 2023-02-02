@@ -1,1 +1,38 @@
-Corda 5 development pre-requisites have been installed.
+Kafka and PostgreSQL have been installed.
+
+**WARNING** These are not intended for production use.
+
+The following overrides should be used when installing a Corda Helm Chart into the same namespace:
+
+bootstrap:
+  kafka:
+    replicas: 1
+db:
+  cluster:
+    host: {{ include "corda-dev.postgresName" . | quote }}
+    password:
+      valueFrom:
+        secretKeyRef:
+          name: {{ include "corda-dev.postgresName" . | quote }}
+          key: "password"
+    username:
+      value: "{{ .Values.postgresql.username }}"
+kafka:
+  bootstrapServers: {{ printf "%s:9092" ( include "corda-dev.kafkaName" . ) | quote }}
+  sasl:
+    enabled: true
+    mechanism: "PLAIN"
+    username:
+      value: "admin"
+    password:
+      valueFrom:
+        secretKeyRef:
+          name: {{ include "corda-dev.kafkaName" . | quote }}
+          key: "password"
+  tls:
+    enabled: true
+    truststore:
+      valueFrom:
+        secretKeyRef:
+          name: {{ include "corda-dev.kafkaName" . | quote }}
+          key: "ca.crt"

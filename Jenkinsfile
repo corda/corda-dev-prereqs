@@ -39,20 +39,6 @@ pipeline {
     }
 
     stages {
-        stage('Add repositories') {
-            steps {
-                sh '''
-                    helm repo add bitnami https://charts.bitnami.com/bitnami
-                '''
-            }
-        }
-        stage('Build dependencies') {
-            steps {
-                sh '''
-                    helm dependency build charts/corda-dev
-                '''
-            }
-        }
         stage('Lint') {
             steps {
                 sh '''
