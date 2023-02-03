@@ -10,13 +10,13 @@ bootstrap:
 db:
   cluster:
     host: {{ include "corda-dev.postgresName" . | quote }}
+    username:
+      value: "corda"
     password:
       valueFrom:
         secretKeyRef:
           name: {{ include "corda-dev.postgresName" . | quote }}
-          key: "password"
-    username:
-      value: "{{ .Values.postgresql.username }}"
+          key: "corda-password"
 kafka:
   bootstrapServers: {{ printf "%s:9092" ( include "corda-dev.kafkaName" . ) | quote }}
   sasl:
@@ -28,7 +28,7 @@ kafka:
       valueFrom:
         secretKeyRef:
           name: {{ include "corda-dev.kafkaName" . | quote }}
-          key: "password"
+          key: "admin-password"
   tls:
     enabled: true
     truststore:
@@ -40,9 +40,9 @@ kafka:
 To access PostgreSQL from outside the Kubernetes cluster:
 
 kubectl port-forward -n {{ .Release.Namespace }} svc/{{ include "corda-dev.postgresName" . }} 5432 &
-export PGUSER={{ .Values.postgresql.username }}
-export PGPASSWORD=$(kubectl get secret -n {{ .Release.Namespace }} {{ include "corda-dev.postgresName" . }} -o go-template='{{ `{{` }} .data.password | base64decode {{ `}}` }}')
-psql -h localhost -p 5432 -d {{ .Values.postgresql.database }}
+export PGUSER=corda
+export PGPASSWORD=$(kubectl get secret -n {{ .Release.Namespace }} {{ include "corda-dev.postgresName" . }} -o go-template='{{ `{{` }} index .data "corda-password" | base64decode {{ `}}` }}')
+psql -h localhost -p 5432 -d cordacluster
 
 To access Kafka from outside the Kubernetes cluster:
 

@@ -18,12 +18,10 @@ spec:
     spec:
       containers:
         - name: "kafka"
-          image: "confluentinc/cp-kafka:7.2.3"
+          image: "{{ .Values.imageRegistry }}/confluentinc/cp-kafka:7.2.3"
           env:
             - name: "KAFKA_ENABLE_KRAFT"
               value: "yes"
-            - name: "KAFKA_LOG4J_ROOT_LOGLEVEL"
-              value: "INFO"
             - name: "ADMIN_PASSWORD"
               valueFrom:
                 secretKeyRef:
@@ -41,6 +39,10 @@ spec:
               kafka-server-start /etc/kafka/server.properties \
                 --override "listener.name.sasl_ssl.plain.sasl.jaas.config=org.apache.kafka.common.security.plain.PlainLoginModule required username=\"admin\" password=\"$ADMIN_PASSWORD\" user_admin=\"$ADMIN_PASSWORD\";" \
                 --override "listener.name.sasl_plaintext.plain.sasl.jaas.config=org.apache.kafka.common.security.plain.PlainLoginModule required username=\"admin\" password=\"$ADMIN_PASSWORD\" user_admin=\"$ADMIN_PASSWORD\";"
+          securityContext:
+            allowPrivilegeEscalation: false
+            runAsNonRoot: true
+            runAsUser: 1000
           volumeMounts:
             - name: "kafka-certs"
               mountPath: "/certs"
@@ -80,6 +82,12 @@ spec:
             failureThreshold: 3
             successThreshold: 1
             {{- include "corda-dev.kafkaProbe" . | nindent 12 }}
+          resources:
+            {{- toYaml .Values.kafka.resources | nindent 12 }}
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       volumes:
         - name: "kafka-config"
           configMap:

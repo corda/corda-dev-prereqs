@@ -8,21 +8,21 @@ metadata:
 spec:
   containers:
     - name: "postgresql"
-      image: "ubuntu/postgres:edge"
+      image: "{{ .Values.imageRegistry }}/postgres:14"
       env:
         - name: "PGPASSWORD"
           valueFrom:
             secretKeyRef:
-              key: "postgres-password"
+              key: "corda-password"
               name: {{ include "corda-dev.postgresName" . | quote }}
       command:
         - "psql"
         - "--host"
         - {{ include "corda-dev.postgresName" . | quote }}
         - "-U"
-        - "postgres"
+        - "corda"
         - "-d"
-        - "postgres"
+        - "cordacluster"
         - "-p"
         - "5432"
   restartPolicy: "Never"

@@ -1,5 +1,18 @@
-postgresql:
-  # -- name of the database to be created
-  database: "cordacluster"
-  # -- name of the user to be created
-  username: "corda"
+# -- Container registry for all images
+imageRegistry: docker.io
+
+# -- List of secrets for pulling images
+imagePullSecrets:
+
+# -- Name of storage class to use for persistent volumes
+storageClassName:
+
+# Kafka specific configuration
+kafka:
+  # -- Resource requests/limits for Kafka
+  resources: {}
+
+# PostgreSQL specific configuration
+postgres:
+  # -- Resource requests/limits for PostgreSQL
+  resources: {}
