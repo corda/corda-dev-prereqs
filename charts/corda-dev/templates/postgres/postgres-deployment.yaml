@@ -32,6 +32,8 @@ spec:
                 secretKeyRef:
                   key: "password"
                   name: {{ include "corda-dev.postgresName" . | quote }}
+            - name: "PGDATA"
+              value: "/var/lib/postgresql/data/pgdata"
           volumeMounts:
             - name: "postgres-config"
               mountPath: "/etc/postgresql/postgresql.conf"
