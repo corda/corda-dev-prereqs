@@ -57,7 +57,7 @@ spec:
               containerPort: 9092
               protocol: "TCP"
             - name: "plaintext"
-              containerPort: 9092
+              containerPort: 9094
               protocol: "TCP"
           startupProbe:
             initialDelaySeconds: 0
