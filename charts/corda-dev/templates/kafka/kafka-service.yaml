@@ -10,7 +10,7 @@ spec:
     {{- include "corda-dev.selectorLabels" . | nindent 4 }}
     app.kubernetes.io/component: kafka
   ports:
-    - protocol: TCP
+    - name: ssl
+      protocol: TCP
       port: 9092
       targetPort: 9092
-      name: kafka

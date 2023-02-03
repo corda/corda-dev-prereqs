@@ -39,7 +39,8 @@ spec:
               dub template "/etc/confluent/docker/log4j.properties.template" "/etc/${COMPONENT}/log4j.properties"
               kafka-storage format --ignore-formatted --cluster-id=$(kafka-storage random-uuid) -c /etc/kafka/server.properties
               kafka-server-start /etc/kafka/server.properties \
-                --override "listener.name.sasl_ssl.plain.sasl.jaas.config=org.apache.kafka.common.security.plain.PlainLoginModule required username=\"admin\" password=\"$ADMIN_PASSWORD\" user_admin=\"$ADMIN_PASSWORD\";"
+                --override "listener.name.sasl_ssl.plain.sasl.jaas.config=org.apache.kafka.common.security.plain.PlainLoginModule required username=\"admin\" password=\"$ADMIN_PASSWORD\" user_admin=\"$ADMIN_PASSWORD\";" \
+                --override "listener.name.sasl_plaintext.plain.sasl.jaas.config=org.apache.kafka.common.security.plain.PlainLoginModule required username=\"admin\" password=\"$ADMIN_PASSWORD\" user_admin=\"$ADMIN_PASSWORD\";"
           volumeMounts:
             - name: "kafka-certs"
               mountPath: "/certs"
@@ -52,8 +53,11 @@ spec:
               mountPath: "/var/lib/kafka/data"
               readOnly: false
           ports:
-            - containerPort: 9092
-              name: "kafka"
+            - name: "ssl"
+              containerPort: 9092
+              protocol: "TCP"
+            - name: "plaintext"
+              containerPort: 9092
               protocol: "TCP"
           startupProbe:
             initialDelaySeconds: 0

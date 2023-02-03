@@ -53,7 +53,7 @@ Kafka probe command.
 */}}
 {{- define "corda-dev.kafkaProbe" -}}
 tcpSocket:
-  port: kafka
+  port: ssl
 {{- end }}
 
 {{/*
