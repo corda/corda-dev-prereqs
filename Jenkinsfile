@@ -39,20 +39,6 @@ pipeline {
     }
 
     stages {
-        stage('Add repositories') {
-            steps {
-                sh '''
-                    helm repo add bitnami https://charts.bitnami.com/bitnami
-                '''
-            }
-        }
-        stage('Build dependencies') {
-            steps {
-                sh '''
-                    helm dependency build charts/corda-dev
-                '''
-            }
-        }
         stage('Lint') {
             steps {
                 sh '''
@@ -75,7 +61,14 @@ pipeline {
                 '''
             }
             post {
-                always {
+                failure {
+                    sh '''
+                        kubectl describe pod -n $NAMESPACE > describe.txt
+                        kubectl logs -n $NAMESPACE -l app.kubernetes.io/instance=prereqs --prefix=true > logs.txt
+                    '''
+                    archiveArtifacts artifacts: "*.txt", allowEmptyArchive: true, fingerprint: true
+                }
+                cleanup {
                     sh '''
                         kubectl delete namespace $NAMESPACE
                     '''

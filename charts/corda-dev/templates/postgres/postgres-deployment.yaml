@@ -1,0 +1,108 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "corda-dev.postgresName" . | quote }}
+  labels:
+    {{- include "corda-dev.labels" . | nindent 4 }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- include "corda-dev.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: "postgres"
+  template:
+    metadata:
+      labels:
+        {{- include "corda-dev.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: "postgres"
+    spec:
+      containers:
+        - name: "postgres"
+          image: "{{ .Values.imageRegistry }}/postgres:14"
+          env:
+            - name: "POSTGRES_DB"
+              value: "cordacluster"
+            - name: "POSTGRES_PASSWORD"
+              valueFrom:
+                secretKeyRef:
+                  key: "postgres-password"
+                  name: {{ include "corda-dev.postgresName" . | quote }}
+            - name: "USER_PASSWORD"
+              valueFrom:
+                secretKeyRef:
+                  key: "corda-password"
+                  name: {{ include "corda-dev.postgresName" . | quote }}
+            - name: "PGDATA"
+              value: "/var/lib/postgresql/data/pgdata"
+          securityContext:
+            allowPrivilegeEscalation: false
+            runAsNonRoot: true
+            runAsUser: 999
+          volumeMounts:
+            - name: "postgres-config"
+              mountPath: "/etc/postgresql/postgresql.conf"
+              subPath: "postgresql.conf"
+            - name: "postgres-init"
+              mountPath: "/docker-entrypoint-initdb.d/init.sh"
+              subPath: "init.sh"
+            - name: "postgres-certs"
+              mountPath: "/certs"
+            - name: "postgres-data"
+              mountPath: "/var/lib/postgresql/data"
+          ports:
+            - containerPort: 5432
+              name: "postgres"
+              protocol: "TCP"
+          startupProbe:
+            initialDelaySeconds: 0
+            periodSeconds: 3
+            timeoutSeconds: 1
+            failureThreshold: 20
+            successThreshold: 1
+            {{- include "corda-dev.postgresProbe" . | nindent 12 }}
+          livenessProbe:
+            initialDelaySeconds: 0
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 6
+            successThreshold: 1
+            {{- include "corda-dev.postgresProbe" . | nindent 12 }}
+          readinessProbe:
+            initialDelaySeconds: 0
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+            successThreshold: 1
+            {{- include "corda-dev.postgresProbe" . | nindent 12 }}
+          resources:
+            {{- toYaml .Values.postgres.resources | nindent 12 }}
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      securityContext:
+        fsGroup: 999
+      volumes:
+        - name: "postgres-config"
+          configMap:
+            name: {{ include "corda-dev.postgresName" . | quote }}
+            items:
+              - key: "postgresql.conf"
+                path: "postgresql.conf"
+        - name: "postgres-init"
+          configMap:
+            name: {{ include "corda-dev.postgresName" . | quote }}
+            items:
+              - key: "init.sh"
+                path: "init.sh"
+        - name: "postgres-certs"
+          secret:
+            secretName: {{ include "corda-dev.postgresName" . | quote }}
+            items:
+              - key: "tls.crt"
+                path: "tls.crt"
+              - key: "tls.key"
+                path: "tls.key"
+        - name: "postgres-data"
+          persistentVolumeClaim:
+            claimName: {{ include "corda-dev.postgresName" . | quote }}

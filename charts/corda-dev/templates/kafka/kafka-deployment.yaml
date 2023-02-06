@@ -1,0 +1,112 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "corda-dev.kafkaName" . | quote }}
+  labels:
+    {{- include "corda-dev.labels" . | nindent 4 }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- include "corda-dev.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: "kafka"
+  template:
+    metadata:
+      labels:
+        {{- include "corda-dev.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: "kafka"
+    spec:
+      containers:
+        - name: "kafka"
+          image: "{{ .Values.imageRegistry }}/confluentinc/cp-kafka:7.2.3"
+          env:
+            - name: "KAFKA_ENABLE_KRAFT"
+              value: "yes"
+            - name: "ADMIN_PASSWORD"
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "corda-dev.kafkaName" . | quote }}
+                  key: "admin-password"
+          command:
+            - "bash"
+            - "-c"
+          args:
+            - |
+              KEY_PASSWORD=$(openssl rand -base64 12)
+              openssl pkcs8 -topk8 -in /certs/tls.key -inform pem -outform pem -passout pass:$KEY_PASSWORD -v1 PBE-SHA1-RC4-128 > /etc/kafka/server.key
+              cat /certs/tls.crt >> /etc/kafka/server.key
+              dub template "/etc/confluent/docker/log4j.properties.template" "/etc/${COMPONENT}/log4j.properties"
+              kafka-storage format --ignore-formatted --cluster-id=$(kafka-storage random-uuid) -c /etc/kafka/server.properties
+              kafka-server-start /etc/kafka/server.properties \
+                --override "listener.name.sasl_ssl.plain.sasl.jaas.config=org.apache.kafka.common.security.plain.PlainLoginModule required username=\"admin\" password=\"$ADMIN_PASSWORD\" user_admin=\"$ADMIN_PASSWORD\";" \
+                --override "listener.name.sasl_plaintext.plain.sasl.jaas.config=org.apache.kafka.common.security.plain.PlainLoginModule required username=\"admin\" password=\"$ADMIN_PASSWORD\" user_admin=\"$ADMIN_PASSWORD\";" \
+                --override ssl.key.password=$KEY_PASSWORD
+          securityContext:
+            allowPrivilegeEscalation: false
+            runAsNonRoot: true
+            runAsUser: 1000
+          volumeMounts:
+            - name: "kafka-certs"
+              mountPath: "/certs"
+              readOnly: true
+            - name: "kafka-config"
+              mountPath: "/etc/kafka/server.properties"
+              subPath: "server.properties"
+              readOnly: true
+            - name: "kafka-data"
+              mountPath: "/var/lib/kafka/data"
+              readOnly: false
+          ports:
+            - name: "ssl"
+              containerPort: 9092
+              protocol: "TCP"
+            - name: "plaintext"
+              containerPort: 9094
+              protocol: "TCP"
+          startupProbe:
+            initialDelaySeconds: 0
+            periodSeconds: 3
+            timeoutSeconds: 1
+            failureThreshold: 20
+            successThreshold: 1
+            {{- include "corda-dev.kafkaProbe" . | nindent 12 }}
+          livenessProbe:
+            initialDelaySeconds: 0
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 6
+            successThreshold: 1
+            {{- include "corda-dev.kafkaProbe" . | nindent 12 }}
+          readinessProbe:
+            initialDelaySeconds: 0
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+            successThreshold: 1
+            {{- include "corda-dev.kafkaProbe" . | nindent 12 }}
+          resources:
+            {{- toYaml .Values.kafka.resources | nindent 12 }}
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      volumes:
+        - name: "kafka-config"
+          configMap:
+            name: {{ include "corda-dev.kafkaName" . | quote }}
+            items:
+              - key: "server.properties"
+                path: "server.properties"
+        - name: "kafka-certs"
+          secret:
+            secretName: {{ include "corda-dev.kafkaName" . | quote }}
+            items:
+              - key: "tls.crt"
+                path: "tls.crt"
+              - key: "tls.key"
+                path: "tls.key"
+              - key: "ca.crt"
+                path: "ca.crt"
+        - name: "kafka-data"
+          persistentVolumeClaim:
+            claimName: {{ include "corda-dev.kafkaName" . | quote }}

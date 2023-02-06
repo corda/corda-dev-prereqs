@@ -1,0 +1,41 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: {{ printf "%s-kafka-test" ( include "corda-dev.fullname" . | trunc 52 | trimSuffix "-" ) | quote }}
+  annotations:
+    "helm.sh/hook": "test"
+    "helm.sh/hook-delete-policy": "before-hook-creation,hook-succeeded"
+spec:
+  containers:
+    - name: "kafka"
+      image: "{{ .Values.imageRegistry }}/confluentinc/cp-kafka:7.2.3"
+      volumeMounts:
+        - mountPath: "/certs"
+          name: "certs"
+          readOnly: true
+      command:
+        - bash
+        - -c
+      args:
+        - |
+          touch /tmp/config.properties
+          echo "security.protocol=SASL_SSL" >> /tmp/config.properties
+          echo "ssl.truststore.location=/certs/ca.crt" >> /tmp/config.properties
+          echo "ssl.truststore.type=PEM" >> /tmp/config.properties
+          echo "sasl.mechanism=PLAIN" >> /tmp/config.properties
+          echo "sasl.jaas.config=org.apache.kafka.common.security.plain.PlainLoginModule required username=\"admin\" password=\"$ADMIN_PASSWORD\";" >> /tmp/config.properties
+          kafka-topics --list --bootstrap-server {{ include "corda-dev.kafkaName" . }}:9092 --command-config /tmp/config.properties
+      env:
+        - name: "ADMIN_PASSWORD"
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "corda-dev.kafkaName" . | quote }}
+              key: "admin-password"
+  volumes:
+    - name: "certs"
+      secret:
+        secretName: {{ include "corda-dev.kafkaName" . | quote }}
+        items:
+          - key: "ca.crt"
+            path: "ca.crt"
+  restartPolicy: "Never"
