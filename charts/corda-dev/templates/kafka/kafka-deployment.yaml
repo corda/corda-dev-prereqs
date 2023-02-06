@@ -32,13 +32,15 @@ spec:
             - "-c"
           args:
             - |
-              openssl pkcs8 -topk8 -in /certs/tls.key -inform pem -outform pem -passout pass:password -v1 PBE-SHA1-RC4-128 > /etc/kafka/server.key
+              KEY_PASSWORD=$(openssl rand -base64 12)
+              openssl pkcs8 -topk8 -in /certs/tls.key -inform pem -outform pem -passout pass:$KEY_PASSWORD -v1 PBE-SHA1-RC4-128 > /etc/kafka/server.key
               cat /certs/tls.crt >> /etc/kafka/server.key
               dub template "/etc/confluent/docker/log4j.properties.template" "/etc/${COMPONENT}/log4j.properties"
               kafka-storage format --ignore-formatted --cluster-id=$(kafka-storage random-uuid) -c /etc/kafka/server.properties
               kafka-server-start /etc/kafka/server.properties \
                 --override "listener.name.sasl_ssl.plain.sasl.jaas.config=org.apache.kafka.common.security.plain.PlainLoginModule required username=\"admin\" password=\"$ADMIN_PASSWORD\" user_admin=\"$ADMIN_PASSWORD\";" \
-                --override "listener.name.sasl_plaintext.plain.sasl.jaas.config=org.apache.kafka.common.security.plain.PlainLoginModule required username=\"admin\" password=\"$ADMIN_PASSWORD\" user_admin=\"$ADMIN_PASSWORD\";"
+                --override "listener.name.sasl_plaintext.plain.sasl.jaas.config=org.apache.kafka.common.security.plain.PlainLoginModule required username=\"admin\" password=\"$ADMIN_PASSWORD\" user_admin=\"$ADMIN_PASSWORD\";" \
+                --override ssl.key.password=$KEY_PASSWORD
           securityContext:
             allowPrivilegeEscalation: false
             runAsNonRoot: true
