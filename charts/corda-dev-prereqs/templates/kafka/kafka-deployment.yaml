@@ -1,19 +1,19 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "corda-dev.kafkaName" . | quote }}
+  name: {{ include "corda-dev-prereqs.kafkaName" . | quote }}
   labels:
-    {{- include "corda-dev.labels" . | nindent 4 }}
+    {{- include "corda-dev-prereqs.labels" . | nindent 4 }}
 spec:
   replicas: 1
   selector:
     matchLabels:
-      {{- include "corda-dev.selectorLabels" . | nindent 6 }}
+      {{- include "corda-dev-prereqs.selectorLabels" . | nindent 6 }}
       app.kubernetes.io/component: "kafka"
   template:
     metadata:
       labels:
-        {{- include "corda-dev.selectorLabels" . | nindent 8 }}
+        {{- include "corda-dev-prereqs.selectorLabels" . | nindent 8 }}
         app.kubernetes.io/component: "kafka"
     spec:
       containers:
@@ -25,7 +25,7 @@ spec:
             - name: "ADMIN_PASSWORD"
               valueFrom:
                 secretKeyRef:
-                  name: {{ include "corda-dev.kafkaName" . | quote }}
+                  name: {{ include "corda-dev-prereqs.kafkaName" . | quote }}
                   key: "admin-password"
           command:
             - "bash"
@@ -69,21 +69,21 @@ spec:
             timeoutSeconds: 1
             failureThreshold: 20
             successThreshold: 1
-            {{- include "corda-dev.kafkaProbe" . | nindent 12 }}
+            {{- include "corda-dev-prereqs.kafkaProbe" . | nindent 12 }}
           livenessProbe:
             initialDelaySeconds: 0
             periodSeconds: 10
             timeoutSeconds: 5
             failureThreshold: 6
             successThreshold: 1
-            {{- include "corda-dev.kafkaProbe" . | nindent 12 }}
+            {{- include "corda-dev-prereqs.kafkaProbe" . | nindent 12 }}
           readinessProbe:
             initialDelaySeconds: 0
             periodSeconds: 10
             timeoutSeconds: 5
             failureThreshold: 3
             successThreshold: 1
-            {{- include "corda-dev.kafkaProbe" . | nindent 12 }}
+            {{- include "corda-dev-prereqs.kafkaProbe" . | nindent 12 }}
           resources:
             {{- toYaml .Values.kafka.resources | nindent 12 }}
       {{- with .Values.imagePullSecrets }}
@@ -93,13 +93,13 @@ spec:
       volumes:
         - name: "kafka-config"
           configMap:
-            name: {{ include "corda-dev.kafkaName" . | quote }}
+            name: {{ include "corda-dev-prereqs.kafkaName" . | quote }}
             items:
               - key: "server.properties"
                 path: "server.properties"
         - name: "kafka-certs"
           secret:
-            secretName: {{ include "corda-dev.kafkaName" . | quote }}
+            secretName: {{ include "corda-dev-prereqs.kafkaName" . | quote }}
             items:
               - key: "tls.crt"
                 path: "tls.crt"
@@ -109,4 +109,4 @@ spec:
                 path: "ca.crt"
         - name: "kafka-data"
           persistentVolumeClaim:
-            claimName: {{ include "corda-dev.kafkaName" . | quote }}
+            claimName: {{ include "corda-dev-prereqs.kafkaName" . | quote }}

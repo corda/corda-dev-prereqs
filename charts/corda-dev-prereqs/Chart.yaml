@@ -1,0 +1,7 @@
+apiVersion: v2
+name: corda-dev-prereqs
+description: A Helm chart for installing Corda 5 development pre-requisites (Kafka and PostgreSQL)
+
+type: application
+version: 0.2.0
+appVersion: "5.0.0"

@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Pod
 metadata:
-  name: {{ printf "%s-postgres-test" ( include "corda-dev.fullname" . | trunc 49 | trimSuffix "-" ) | quote }}
+  name: {{ printf "%s-postgres-test" ( include "corda-dev-prereqs.fullname" . | trunc 49 | trimSuffix "-" ) | quote }}
   annotations:
     "helm.sh/hook": "test"
     "helm.sh/hook-delete-policy": "before-hook-creation,hook-succeeded"
@@ -14,11 +14,11 @@ spec:
           valueFrom:
             secretKeyRef:
               key: "corda-password"
-              name: {{ include "corda-dev.postgresName" . | quote }}
+              name: {{ include "corda-dev-prereqs.postgresName" . | quote }}
       command:
         - "psql"
         - "--host"
-        - {{ include "corda-dev.postgresName" . | quote }}
+        - {{ include "corda-dev-prereqs.postgresName" . | quote }}
         - "-U"
         - "corda"
         - "-d"

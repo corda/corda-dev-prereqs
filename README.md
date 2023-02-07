@@ -1,7 +1,7 @@
 # Corda 5 Development Pre-requisites Helm chart
 
 The contents of this repository can be used to install the Kafka and PostgreSQL pre-requisites for Corda 5 development.
-The auto-generated [charts/corda-dev/README.md](README.md) contains details of the configurable values.
+The auto-generated [charts/corda-dev-prereqs/README.md](README.md) contains details of the configurable values.
 
 ## Installation from source
 
@@ -11,7 +11,7 @@ Assuming [helm](https://helm.sh/) with a version greater than 3.7 is installed, 
 
 To install the helm chart with the default values run the following command:
 ```shell
-helm upgrade -i "<RELEASE NAME>" charts/corda-dev --namespace "<RELEASE NAMESPACE>" --create-namespace --wait
+helm upgrade -i "<RELEASE NAME>" charts/corda-dev-prereqs --namespace "<RELEASE NAMESPACE>" --create-namespace --wait
 ```
 
 On completion, the chart outputs the overrides that should then be used with your Corda Helm install.
@@ -26,7 +26,7 @@ helm test "<RELEASE NAME>" -n "<RELEASE NAMESPACE>"
 
 ### Maintaining
 
-As new value fields are added to the default [charts/corda-dev/values.yaml](values.yaml), doc strings should be included.
+As new value fields are added to the default [charts/corda-dev-prereqs/values.yaml](values.yaml), doc strings should be included.
 
 For objects prefer this style:
 ```yaml
@@ -46,6 +46,6 @@ Generate the README.md via:
 
 ```shell
 $ helm-docs
-INFO[2022-02-22T18:13:16Z] Found Chart directories [charts/corda-dev]
-INFO[2022-02-22T18:13:16Z] Generating README Documentation for chart /mnt/c/src/corda-dev-helm/charts/corda-dev
+INFO[2022-02-22T18:13:16Z] Found Chart directories [charts/corda-dev-prereqs]
+INFO[2022-02-22T18:13:16Z] Generating README Documentation for chart charts/corda-dev-prereqs
 ```

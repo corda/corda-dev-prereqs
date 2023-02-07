@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Pod
 metadata:
-  name: {{ printf "%s-kafka-test" ( include "corda-dev.fullname" . | trunc 52 | trimSuffix "-" ) | quote }}
+  name: {{ printf "%s-kafka-test" ( include "corda-dev-prereqs.fullname" . | trunc 52 | trimSuffix "-" ) | quote }}
   annotations:
     "helm.sh/hook": "test"
     "helm.sh/hook-delete-policy": "before-hook-creation,hook-succeeded"
@@ -24,17 +24,17 @@ spec:
           echo "ssl.truststore.type=PEM" >> /tmp/config.properties
           echo "sasl.mechanism=PLAIN" >> /tmp/config.properties
           echo "sasl.jaas.config=org.apache.kafka.common.security.plain.PlainLoginModule required username=\"admin\" password=\"$ADMIN_PASSWORD\";" >> /tmp/config.properties
-          kafka-topics --list --bootstrap-server {{ include "corda-dev.kafkaName" . }}:9092 --command-config /tmp/config.properties
+          kafka-topics --list --bootstrap-server {{ include "corda-dev-prereqs.kafkaName" . }}:9092 --command-config /tmp/config.properties
       env:
         - name: "ADMIN_PASSWORD"
           valueFrom:
             secretKeyRef:
-              name: {{ include "corda-dev.kafkaName" . | quote }}
+              name: {{ include "corda-dev-prereqs.kafkaName" . | quote }}
               key: "admin-password"
   volumes:
     - name: "certs"
       secret:
-        secretName: {{ include "corda-dev.kafkaName" . | quote }}
+        secretName: {{ include "corda-dev-prereqs.kafkaName" . | quote }}
         items:
           - key: "ca.crt"
             path: "ca.crt"
