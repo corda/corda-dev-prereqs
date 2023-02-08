@@ -1,7 +1,0 @@
-apiVersion: v2
-name: corda-dev
-description: A Helm chart for installing Corda 5 development pre-requisites
-
-type: application
-version: 0.2.0
-appVersion: "5.0.0"

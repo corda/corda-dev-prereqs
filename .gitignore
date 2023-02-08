@@ -1,2 +1,2 @@
-charts/corda-dev/charts/*
+charts/corda-dev-prereqs/charts/*
 .idea

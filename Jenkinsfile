@@ -1,9 +1,18 @@
 def chartVersion() {
-    def chartVersion = sh(script:'helm show chart charts/corda-dev | sed -n \'s/^version: \\(.*\\)$/\\1/p\'', returnStdout: true).trim()
+    def chartVersion = sh(script:'helm show chart charts/corda-dev-prereqs | sed -n \'s/^version: \\(.*\\)$/\\1/p\'', returnStdout: true).trim()
     if (env.BRANCH_NAME == 'main') {
         return "$chartVersion"
     } else {
         return "$chartVersion-${env.BRANCH_NAME}".replaceAll("[/]", "_")
+    }
+}
+
+def publishHelmChart(String credentialsName) {
+    withCredentials([usernamePassword(credentialsId: credentialsName, passwordVariable: 'HELM_REGISTRY_PASSWORD', usernameVariable: 'HELM_REGISTRY_USERNAME')]) {
+        sh '''
+            echo $HELM_REGISTRY_PASSWORD | helm registry login $HELM_REGISTRY -u $HELM_REGISTRY_USERNAME --password-stdin
+            helm push corda-dev-prereqs-$CHART_VERSION.tgz oci://$HELM_REGISTRY/$HELM_REPOSITORY
+        '''
     }
 }
 
@@ -42,21 +51,21 @@ pipeline {
         stage('Lint') {
             steps {
                 sh '''
-                    helm lint charts/corda-dev
+                    helm lint charts/corda-dev-prereqs
                 '''
             }
         }
         stage('Package') {
             steps {
                 sh '''
-                    helm package charts/corda-dev --version $CHART_VERSION
+                    helm package charts/corda-dev-prereqs --version $CHART_VERSION
                 '''
             }
         }
         stage('Test') {
             steps {
                 sh '''
-                    helm install prereqs corda-dev-$CHART_VERSION.tgz -n $NAMESPACE --create-namespace --wait
+                    helm install prereqs corda-dev-prereqs-$CHART_VERSION.tgz -n $NAMESPACE --create-namespace --wait
                     helm test prereqs -n $NAMESPACE
                 '''
             }
@@ -75,14 +84,25 @@ pipeline {
                 }
             }
         }
-        stage('Publish') {
+        stage('Publish to Artifactory') {
+            environment {
+                HELM_REGISTRY="corda-os-docker-${env.BRANCH_NAME == 'main' ? 'stable' : 'dev'}.software.r3.com"
+                HELM_REPOSITORY='helm-charts'
+            }
             steps {
-                withCredentials([usernamePassword(credentialsId: 'artifactory-credentials', passwordVariable: 'PASSWORD', usernameVariable: 'USER')]) {
-                    sh '''
-                        echo $PASSWORD | helm registry login corda-os-docker-dev.software.r3.com -u $USER --password-stdin
-                        helm push corda-dev-$CHART_VERSION.tgz oci://corda-os-docker-dev.software.r3.com/helm-charts
-                    '''
-                }
+                publishHelmChart('artifactory-credentials')
+            }
+        }
+        stage('Publish to Docker Hub') {
+            when {
+                branch 'main'
+            }
+            environment {
+                HELM_REGISTRY='registry-1.docker.io'
+                HELM_REPOSITORY='corda'
+            }
+            steps {
+                publishHelmChart('docker-hub-cordapusher')
             }
         }
     }

@@ -9,16 +9,16 @@ bootstrap:
     replicas: 1
 db:
   cluster:
-    host: {{ include "corda-dev.postgresName" . | quote }}
+    host: {{ include "corda-dev-prereqs.postgresName" . | quote }}
     username:
       value: "corda"
     password:
       valueFrom:
         secretKeyRef:
-          name: {{ include "corda-dev.postgresName" . | quote }}
+          name: {{ include "corda-dev-prereqs.postgresName" . | quote }}
           key: "corda-password"
 kafka:
-  bootstrapServers: {{ printf "%s:9092" ( include "corda-dev.kafkaName" . ) | quote }}
+  bootstrapServers: {{ printf "%s:9092" ( include "corda-dev-prereqs.kafkaName" . ) | quote }}
   sasl:
     enabled: true
     mechanism: "PLAIN"
@@ -27,26 +27,26 @@ kafka:
     password:
       valueFrom:
         secretKeyRef:
-          name: {{ include "corda-dev.kafkaName" . | quote }}
+          name: {{ include "corda-dev-prereqs.kafkaName" . | quote }}
           key: "admin-password"
   tls:
     enabled: true
     truststore:
       valueFrom:
         secretKeyRef:
-          name: {{ include "corda-dev.kafkaName" . | quote }}
+          name: {{ include "corda-dev-prereqs.kafkaName" . | quote }}
           key: "ca.crt"
 
 To access PostgreSQL from outside the Kubernetes cluster:
 
-kubectl port-forward -n {{ .Release.Namespace }} svc/{{ include "corda-dev.postgresName" . }} 5432 &
+kubectl port-forward -n {{ .Release.Namespace }} svc/{{ include "corda-dev-prereqs.postgresName" . }} 5432 &
 export PGUSER=corda
-export PGPASSWORD=$(kubectl get secret -n {{ .Release.Namespace }} {{ include "corda-dev.postgresName" . }} -o go-template='{{ `{{` }} index .data "corda-password" | base64decode {{ `}}` }}')
+export PGPASSWORD=$(kubectl get secret -n {{ .Release.Namespace }} {{ include "corda-dev-prereqs.postgresName" . }} -o go-template='{{ `{{` }} index .data "corda-password" | base64decode {{ `}}` }}')
 psql -h localhost -p 5432 -d cordacluster
 
 To access Kafka from outside the Kubernetes cluster:
 
-export KAFKA_PASSWORD=$(kubectl get secret -n {{ .Release.Namespace }} {{ include "corda-dev.kafkaName" . }} -o go-template='{{ `{{` }} index .data "admin-password" | base64decode {{ `}}` }}')
+export KAFKA_PASSWORD=$(kubectl get secret -n {{ .Release.Namespace }} {{ include "corda-dev-prereqs.kafkaName" . }} -o go-template='{{ `{{` }} index .data "admin-password" | base64decode {{ `}}` }}')
 echo "security.protocol=SASL_PLAINTEXT" > client.properties
 echo "sasl.mechanism=PLAIN" >> client.properties
 echo "sasl.jaas.config=org.apache.kafka.common.security.plain.PlainLoginModule required username=\"admin\" password=\"$KAFKA_PASSWORD\";" >> client.properties

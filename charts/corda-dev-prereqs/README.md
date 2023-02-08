@@ -1,8 +1,8 @@
-# corda-dev
+# corda-dev-prereqs
 
 ![Version: 0.2.0](https://img.shields.io/badge/Version-0.2.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 5.0.0](https://img.shields.io/badge/AppVersion-5.0.0-informational?style=flat-square)
 
-A Helm chart for installing Corda 5 development pre-requisites
+A Helm chart for installing Corda 5 development pre-requisites (Kafka and PostgreSQL)
 
 ## Values
 

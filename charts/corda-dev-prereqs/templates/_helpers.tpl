@@ -3,7 +3,7 @@ Create a default fully qualified app name.
 We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
 If release name contains chart name it will be used as a full name.
 */}}
-{{- define "corda-dev.fullname" -}}
+{{- define "corda-dev-prereqs.fullname" -}}
 {{- $name := .Chart.Name }}
 {{- if contains $name .Release.Name }}
 {{- .Release.Name | trunc 63 | trimSuffix "-" }}
@@ -15,21 +15,21 @@ If release name contains chart name it will be used as a full name.
 {{/*
 Name for PostgreSQL related resources.
 */}}
-{{- define "corda-dev.postgresName" -}}
+{{- define "corda-dev-prereqs.postgresName" -}}
 {{ printf "%s-postgres" ( .Release.Name | trunc 54 | trimSuffix "-" ) }}
 {{- end }}
 
 {{/*
 Name for Kafka related resources.
 */}}
-{{- define "corda-dev.kafkaName" -}}
+{{- define "corda-dev-prereqs.kafkaName" -}}
 {{ printf "%s-kafka" ( .Release.Name | trunc 54 | trimSuffix "-" ) }}
 {{- end }}
 
 {{/*
 PostgreSQL probe command.
 */}}
-{{- define "corda-dev.postgresProbe" -}}
+{{- define "corda-dev-prereqs.postgresProbe" -}}
 exec:
   command:
     - /bin/sh
@@ -40,7 +40,7 @@ exec:
 {{/*
 Kafka probe command.
 */}}
-{{- define "corda-dev.kafkaProbe" -}}
+{{- define "corda-dev-prereqs.kafkaProbe" -}}
 tcpSocket:
   port: "ssl"
 {{- end }}
@@ -48,16 +48,16 @@ tcpSocket:
 {{/*
 Create chart name and version as used by the chart label.
 */}}
-{{- define "corda-dev.chart" -}}
+{{- define "corda-dev-prereqs.chart" -}}
 {{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
 {{/*
 Common labels
 */}}
-{{- define "corda-dev.labels" -}}
-helm.sh/chart: {{ include "corda-dev.chart" . }}
-{{ include "corda-dev.selectorLabels" . }}
+{{- define "corda-dev-prereqs.labels" -}}
+helm.sh/chart: {{ include "corda-dev-prereqs.chart" . }}
+{{ include "corda-dev-prereqs.selectorLabels" . }}
 {{- if .Chart.AppVersion }}
 app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 {{- end }}
@@ -67,7 +67,7 @@ app.kubernetes.io/managed-by: {{ .Release.Service | quote }}
 {{/*
 Selector labels
 */}}
-{{- define "corda-dev.selectorLabels" -}}
+{{- define "corda-dev-prereqs.selectorLabels" -}}
 app.kubernetes.io/name: "corda-dev"
 app.kubernetes.io/instance: {{ .Release.Name | quote }}
 {{- end }}
