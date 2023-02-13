@@ -1,0 +1,189 @@
+{
+  "$schema": "https://json-schema.org/draft/2019-09/schema",
+  "$id": "http://corda.net/corda-dev-prereqs-helm.json",
+  "type": "object",
+  "default": {},
+  "title": "corda-dev-prereqs",
+  "required": [
+    "imageRegistry",
+    "kafka",
+    "postgres"
+  ],
+  "properties": {
+    "imageRegistry": {
+      "type": "string",
+      "default": "",
+      "title": "Registry for Docker images",
+      "examples": [
+        "docker.io"
+      ]
+    },
+    "imagePullSecrets": {
+      "type": "array",
+      "default": [],
+      "title": "List of image pull secrets",
+      "items": {
+        "type": "object",
+        "description": "Reference to image pull secret",
+        "properties": {
+          "name": {
+            "type": [
+              "string"
+            ],
+            "description": "Image pull secret name"
+          }
+        },
+        "additionalProperties": false
+      },
+      "examples": [
+        [
+          {
+            "name": "my-secret"
+          }
+        ]
+      ]
+    },
+    "storageClassName": {
+      "type": [
+        "string",
+        "null"
+        ],
+      "default": "",
+      "title": "Storage class name",
+      "examples": [
+        "storage-class"
+      ]
+    },
+    "kafka": {
+      "type": "object",
+      "default": {},
+      "title": "Kafka configuration",
+      "required": [
+        "resources"
+      ],
+      "properties": {
+        "resources": {
+          "title": "Resources for Kafka pod",
+          "$ref": "#/$defs/resources"
+        }
+      },
+      "additionalProperties": false,
+      "examples": [{
+        "resources": {
+          "requests": {
+            "cpu": "1000mi",
+            "memory": "1Gi"
+          },
+          "limits": {
+            "cpu": "1000mi",
+            "memory": "1Gi"
+          }
+        }
+      }]
+    },
+    "postgres": {
+      "type": "object",
+      "default": {},
+      "title": "PostgreSQL configuration",
+      "required": [
+        "resources"
+      ],
+      "properties": {
+        "resources": {
+          "title": "Resources for PostgreSQL pod",
+          "$ref": "#/$defs/resources"
+        }
+      },
+      "additionalProperties": false,
+      "examples": [{
+        "resources": {
+          "requests": {
+            "cpu": "1000mi",
+            "memory": "1Gi"
+          },
+          "limits": {
+            "cpu": "1000mi",
+            "memory": "1Gi"
+          }
+        }
+      }]
+    }
+  },
+  "additionalProperties": false,
+  "examples": [{
+    "imageRegistry": "docker.io",
+    "imagePullSecrets": [
+      {
+        "name": "my-secret"
+      }
+    ],
+    "storageClassName": "storage-class",
+    "kafka": {
+      "resources": {
+        "requests": {
+          "cpu": "1000mi",
+          "memory": "1Gi"
+        },
+        "limits": {
+          "cpu": "1000mi",
+          "memory": "1Gi"
+        }}
+    },
+    "postgres": {
+      "resources": {
+        "requests": {
+          "cpu": "1000mi",
+          "memory": "1Gi"
+        },
+        "limits": {
+          "cpu": "1000mi",
+          "memory": "1Gi"
+        }}
+    }
+  }],
+  "$defs": {
+    "resources": {
+      "type": "object",
+      "title": "Compute resource requirements.",
+      "properties": {
+        "requests": {
+          "$ref": "#/$defs/cpu-memory",
+          "title": "Minimum amount of compute resources required."
+        },
+        "limits": {
+          "$ref": "#/$defs/cpu-memory",
+          "title": "Limits describes the maximum amount of compute resources allowed."
+        }
+      },
+      "additionalProperties": false
+    },
+    "cpu-memory": {
+      "type": "object",
+      "properties": {
+        "cpu": {
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "integer"
+            }
+          ],
+          "title": "CPU."
+        },
+        "memory": {
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "integer"
+            }
+          ],
+          "title": "Memory."
+        }
+      }
+    },
+    "additionalProperties": false
+  }
+}

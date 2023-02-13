@@ -2,7 +2,7 @@
 imageRegistry: docker.io
 
 # -- List of secrets for pulling images
-imagePullSecrets:
+imagePullSecrets: []
 
 # -- Name of storage class to use for persistent volumes
 storageClassName:
