@@ -1,10 +1,11 @@
 apiVersion: apps/v1
-kind: Deployment
+kind: StatefulSet
 metadata:
   name: {{ include "corda-dev-prereqs.kafkaName" . | quote }}
   labels:
     {{- include "corda-dev-prereqs.labels" . | nindent 4 }}
 spec:
+  serviceName: "kafka"
   replicas: 1
   selector:
     matchLabels:
@@ -18,7 +19,7 @@ spec:
     spec:
       containers:
         - name: "kafka"
-          image: "{{ .Values.imageRegistry }}/confluentinc/cp-kafka:7.2.3"
+          image: "{{ .Values.imageRegistry }}/confluentinc/cp-kafka:7.3.3"
           env:
             - name: "KAFKA_ENABLE_KRAFT"
               value: "yes"
@@ -44,7 +45,6 @@ spec:
           securityContext:
             allowPrivilegeEscalation: false
             runAsNonRoot: true
-            runAsUser: 1000
           volumeMounts:
             - name: "kafka-certs"
               mountPath: "/certs"
@@ -90,6 +90,10 @@ spec:
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+      securityContext:
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
       volumes:
         - name: "kafka-config"
           configMap:
@@ -107,6 +111,15 @@ spec:
                 path: "tls.key"
               - key: "ca.crt"
                 path: "ca.crt"
-        - name: "kafka-data"
-          persistentVolumeClaim:
-            claimName: {{ include "corda-dev-prereqs.kafkaName" . | quote }}
+  volumeClaimTemplates:
+    - metadata:
+        name: "kafka-data"
+        labels:
+          {{- include "corda-dev-prereqs.labels" . | nindent 10 }}
+      spec:
+        accessModes:
+          - "ReadWriteOnce"
+        resources:
+          requests:
+            storage: "500M"
+        storageClassName: {{ .Values.storageClassName }}
