@@ -37,18 +37,43 @@ kafka:
           name: {{ include "corda-dev-prereqs.kafkaName" . | quote }}
           key: "ca.crt"
 
-To access PostgreSQL from outside the Kubernetes cluster:
+To run PostgreSQL commands within the cluster using the psql command line tool, exec to the PostgreSQL container:
+
+kubectl exec -it -n {{ .Release.Namespace }} $(kubectl get pods -n prereqs --selector=app.kubernetes.io/component=postgres,app.kubernetes.io/instance={{ .Release.Name }} -o=name) -- psql cordacluster
+
+To access PostgreSQL from outside the Kubernetes cluster, forward the port and retrieve the credentials:
 
 kubectl port-forward -n {{ .Release.Namespace }} svc/{{ include "corda-dev-prereqs.postgresName" . }} 5432 &
 export PGUSER=corda
 export PGPASSWORD=$(kubectl get secret -n {{ .Release.Namespace }} {{ include "corda-dev-prereqs.postgresName" . }} -o go-template='{{ `{{` }} index .data "corda-password" | base64decode {{ `}}` }}')
+
+The cordacluster database can then be accessed on localhost port 5432 using a database client.
+For example, using the psql client shipped with PostgreSQL:
+
 psql -h localhost -p 5432 -d cordacluster
 
-To access Kafka from outside the Kubernetes cluster:
+To run Kafka commands within the cluster using the scripts shipped with Kafka, exec to the Kafka container, create a client property file, and execute the desired command.
+For example:
 
-export KAFKA_PASSWORD=$(kubectl get secret -n {{ .Release.Namespace }} {{ include "corda-dev-prereqs.kafkaName" . }} -o go-template='{{ `{{` }} index .data "admin-password" | base64decode {{ `}}` }}')
-echo "security.protocol=SASL_PLAINTEXT" > client.properties
-echo "sasl.mechanism=PLAIN" >> client.properties
-echo "sasl.jaas.config=org.apache.kafka.common.security.plain.PlainLoginModule required username=\"admin\" password=\"$KAFKA_PASSWORD\";" >> client.properties
+kubectl exec -it -n {{ .Release.Namespace }} $(kubectl get pods -n prereqs --selector=app.kubernetes.io/component=kafka,app.kubernetes.io/instance={{ .Release.Name }} -o=name) -- bash
+cat <<EOF >> client.properties
+security.protocol=SASL_PLAINTEXT
+sasl.mechanism=PLAIN
+sasl.jaas.config=org.apache.kafka.common.security.plain.PlainLoginModule required username=\"admin\" password=\"$ADMIN_PASSWORD\";
+EOF
+kafka-topics --list --bootstrap-server localhost:9094 --command-config client.properties
+
+To access Kafka from outside the Kubernetes cluster, forward the port and create a client property file:
+
 kubectl port-forward -n {{ .Release.Namespace }} $(kubectl get pods -n {{ .Release.Namespace }} --selector=app.kubernetes.io/component=kafka,app.kubernetes.io/instance={{ .Release.Name }} -o=name) 9094 &
+export ADMIN_PASSWORD=$(kubectl get secret -n {{ .Release.Namespace }} {{ include "corda-dev-prereqs.kafkaName" . }} -o go-template='{{ `{{` }} index .data "admin-password" | base64decode {{ `}}` }}')
+cat <<EOF >> client.properties
+security.protocol=SASL_PLAINTEXT
+sasl.mechanism=PLAIN
+sasl.jaas.config=org.apache.kafka.common.security.plain.PlainLoginModule required username=\"admin\" password=\"$ADMIN_PASSWORD\";
+EOF
+
+The Kafka broker can then be accessed using the bootstrap server localhost:9094 and the client property file.
+For example, using the kafka-topics script shipped with Kafka to list the topics:
+
 kafka-topics --list --bootstrap-server localhost:9094 --command-config client.properties
