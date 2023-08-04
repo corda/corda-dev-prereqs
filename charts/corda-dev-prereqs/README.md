@@ -8,9 +8,10 @@ A Helm chart for installing Corda 5 development pre-requisites (Kafka and Postgr
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| imagePullSecrets | string | `nil` | List of secrets for pulling images |
+| imagePullSecrets | list | `[]` | List of secrets for pulling images |
 | imageRegistry | string | `"docker.io"` | Container registry for all images |
 | kafka.resources | object | `{}` | Resource requests/limits for Kafka |
+| maxConnections | int | `200` | Maximum number of concurrent connections to PostgreSQL |
 | postgres.resources | object | `{}` | Resource requests/limits for PostgreSQL |
 | storageClassName | string | `nil` | Name of storage class to use for persistent volumes |
 

@@ -54,6 +54,14 @@
         "storage-class"
       ]
     },
+    "maxConnections": {
+      "type": "integer",
+      "default": 200,
+      "title": "Maximum number of concurrent connections to PostgreSQL",
+      "examples": [
+        200
+      ]
+    },
     "kafka": {
       "type": "object",
       "default": {},
@@ -118,6 +126,7 @@
       }
     ],
     "storageClassName": "storage-class",
+    "maxConnections": 200,
     "kafka": {
       "resources": {
         "requests": {
