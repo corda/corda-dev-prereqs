@@ -19,6 +19,7 @@ spec:
       containers:
         - name: "postgres"
           image: "{{ .Values.imageRegistry }}/postgres:14"
+          args: ["-c", "max_connections={{ .Values.maxConnections }}"]
           env:
             - name: "POSTGRES_DB"
               value: "cordacluster"

@@ -7,6 +7,9 @@ imagePullSecrets: []
 # -- Name of storage class to use for persistent volumes
 storageClassName:
 
+# -- Maximum number of concurrent connections to PostgreSQL
+maxConnections: 200
+
 # Kafka specific configuration
 kafka:
   # -- Resource requests/limits for Kafka
