@@ -19,7 +19,7 @@ spec:
     spec:
       containers:
         - name: "kafka"
-          image: "{{ .Values.imageRegistry }}/confluentinc/cp-kafka:7.3.3"
+          image: "{{ .Values.imageRegistry }}/confluentinc/cp-kafka:7.5.3"
           env:
             - name: "KAFKA_ENABLE_KRAFT"
               value: "yes"
