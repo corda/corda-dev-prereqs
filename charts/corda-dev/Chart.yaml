@@ -3,15 +3,15 @@ name: corda-dev
 description: A Helm chart for installing Corda 5 development pre-requisites
 
 type: application
-version: 0.1.0
+version: 0.2.0
 appVersion: "5.0.0"
 
 dependencies:
   - name: postgresql
-    version: 12.1.0
+    version: 13.2.27
     repository: https://charts.bitnami.com/bitnami
     condition: postgresql.enabled
   - name: kafka
-    version: 19.1.0
+    version: 26.6.2
     repository: https://charts.bitnami.com/bitnami
     condition: kafka.enabled
