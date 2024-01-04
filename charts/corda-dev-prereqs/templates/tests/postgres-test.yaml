@@ -8,7 +8,7 @@ metadata:
 spec:
   containers:
     - name: "postgresql"
-      image: "{{ .Values.imageRegistry }}/postgres:14"
+      image: "{{ .Values.imageRegistry }}/postgres:16.1"
       env:
         - name: "PGPASSWORD"
           valueFrom:
