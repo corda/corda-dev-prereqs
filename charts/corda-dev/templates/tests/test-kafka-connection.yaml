@@ -45,9 +45,9 @@ spec:
             {{- end }}
             {{- end }}
             {{- if or (eq .Values.kafka.auth.clientProtocol "sasl_tls") (eq .Values.kafka.auth.clientProtocol "sasl")  }}
-            {{- if .Values.kafka.auth.sasl.mechanisms | regexFind "scram-sha-256" }}
+            {{- if regexFind "scram-sha-256" .Values.kafka.auth.sasl.mechanism }}
             echo "sasl.mechanism=SCRAM-SHA-256" >> /tmp/config.properties
-            {{- else if .Values.kafka.auth.sasl.mechanisms | regexFind "scram-sha-512" }}
+            {{- else if regexFind "scram-sha-512" .Values.kafka.auth.sasl.mechanism }}
             echo "sasl.mechanism=SCRAM-SHA-512" >> /tmp/config.properties
             {{- else }}
             echo "sasl.mechanism=PLAIN" >> /tmp/config.properties
