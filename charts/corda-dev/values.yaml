@@ -31,7 +31,19 @@ kafka:
     client:
       # -- client users to authenticate with Kafka.
       users:
-        - "user"
+        - "bootstrap"
+        - "crypto"
+        - "db"
+        - "flow"
+        - "flowMapper"
+        - "verification"
+        - "membership"
+        - "p2pGateway"
+        - "p2pLinkManager"
+        - "persistence"
+        - "tokenSelection"
+        - "rest"
+        - "uniqueness"
       # -- client passwords to authenticate with Kafka; generated if not specified.
       passwords:
   # tls configuration.
@@ -46,7 +58,7 @@ kafka:
   kraft:
     # -- enable/disable KRaft.
     enabled: true
-    # -- set a static replica count of zookeeper nodes.
+    # -- set a static replica count of KRaft nodes.
     replicaCount: 1
 
 # values for configuring bitnami/postgres sub-chart.
