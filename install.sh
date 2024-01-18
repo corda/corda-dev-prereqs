@@ -2,6 +2,7 @@
 set -E
 NAMESPACE=test-corda-dev
 CHART_VERSION=0.2.0-test-corda-dev
+PATH_TO_CORDA=../corda-runtime-os
 
 kubectl delete ns $NAMESPACE || echo note: corda was not installed before to this cluster in the corda namespace
 
@@ -51,7 +52,7 @@ echo -e '\n###########################################\nInstalling Corda\n######
 helm upgrade --install corda -n $NAMESPACE \
     oci://corda-os-docker.software.r3.com/helm-charts/release/os/5.2/corda \
     --version "^5.2.0-beta" \
-    -f ../corda-runtime-os/values-prereqs.yaml \
+    -f $PATH_TO_CORDA/values-prereqs.yaml \
     --set 'bootstrap.db.cluster.password.valueFrom.secretKeyRef.name=prereqs-postgresql' \
     --set 'db.cluster.host=prereqs-postgresql' \
     --set 'db.cluster.password.valueFrom.secretKeyRef.name=prereqs-postgresql' \
