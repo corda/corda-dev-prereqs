@@ -1,4 +1,4 @@
-# corda-dev
+# Helm Chart for Corda 5 Development Pre-requisites
 
 ![Version: 0.2.0](https://img.shields.io/badge/Version-0.2.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 5.0.0](https://img.shields.io/badge/AppVersion-5.0.0-informational?style=flat-square)
 
@@ -16,7 +16,7 @@ A Helm chart for installing Corda 5 development pre-requisites
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
 | kafka.enabled | bool | `true` | enable/disable kafka. |
-| kafka.extraConfig | string | `"authorizer.class.name=org.apache.kafka.metadata.authorizer.StandardAuthorizer\nauto.create.topics.enable=false\nallow.everyone.if.no.acl.found=true\nsuper.users=User:controller_user;User:bootstrap"` |  |
+| kafka.extraConfig | string | `"authorizer.class.name=org.apache.kafka.metadata.authorizer.StandardAuthorizer\nauto.create.topics.enable=false\nallow.everyone.if.no.acl.found=true\nsuper.users=User:controller_user"` | Extra config to append to the Kafka server.properties. |
 | kafka.image.tag | string | `"3.6.1-debian-11-r0"` |  |
 | kafka.listeners.client.protocol | string | `"SASL_SSL"` | client protocol. |
 | kafka.listeners.client.sslClientAuth | string | `"none"` | client ssl authentication e.g. required. |
@@ -26,7 +26,7 @@ A Helm chart for installing Corda 5 development pre-requisites
 | kafka.tls.type | string | `"PEM"` | type of the tls certificates. |
 | postgresql.auth.database | string | `"cordacluster"` | name of database to be created. |
 | postgresql.auth.password | string | `nil` | name of the password of the user to be created - defaults to generated value. |
-| postgresql.auth.username | string | `"corda"` | name of the user to be created. |
+| postgresql.auth.username | string | `"user"` | name of the user to be created. |
 | postgresql.enabled | bool | `true` | enable/disable postgres. |
 | postgresql.image.tag | string | `"14.10.0-debian-11-r23"` |  |
 | postgresql.primary.initdb.scripts | object | corda_user_init.sh | ConfigMap-like object containing scripts to be executed on startup. |

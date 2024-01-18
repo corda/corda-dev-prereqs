@@ -55,6 +55,7 @@ helm upgrade --install corda -n $NAMESPACE \
     -f $PATH_TO_CORDA/values-prereqs.yaml \
     --set 'bootstrap.db.cluster.password.valueFrom.secretKeyRef.name=prereqs-postgresql' \
     --set 'db.cluster.host=prereqs-postgresql' \
+    --set 'db.cluster.username.value=user' \
     --set 'db.cluster.password.valueFrom.secretKeyRef.name=prereqs-postgresql' \
     --set 'db.cluster.password.valueFrom.secretKeyRef.key=password' \
     --set 'kafka.sasl.mechanism=SCRAM-SHA-256' \

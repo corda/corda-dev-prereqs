@@ -5,7 +5,12 @@ kafka:
   # Configuring Kafka image.
   image:
     tag: 3.6.1-debian-11-r0
-  extraConfig: "authorizer.class.name=org.apache.kafka.metadata.authorizer.StandardAuthorizer\nauto.create.topics.enable=false\nallow.everyone.if.no.acl.found=true\nsuper.users=User:controller_user;User:bootstrap"
+  # -- Extra config to append to the Kafka server.properties.
+  extraConfig: |-
+    authorizer.class.name=org.apache.kafka.metadata.authorizer.StandardAuthorizer
+    auto.create.topics.enable=false
+    allow.everyone.if.no.acl.found=true
+    super.users=User:controller_user
   # listeners configuration.
   listeners:
     # client configuration.
@@ -64,7 +69,7 @@ postgresql:
     # -- name of database to be created.
     database: cordacluster
     # -- name of the user to be created.
-    username: corda
+    username: user
     # -- name of the password of the user to be created - defaults to generated value.
     password:
   # primary (read/write instance) configuration.
