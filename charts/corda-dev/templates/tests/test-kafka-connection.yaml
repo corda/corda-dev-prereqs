@@ -45,10 +45,10 @@ spec:
             {{- end }}
             {{- end }}
             {{- if or (eq .Values.kafka.listeners.client.protocol "SASL_SSL") (eq .Values.kafka.listeners.client.protocol "SASL")  }}
-            {{- if regexFind "scram-sha-256" .Values.kafka.sasl.mechanism }}
-            echo "sasl.mechanism=SCRAM-SHA-256" >> /tmp/config.properties
-            {{- else if regexFind "scram-sha-512" .Values.kafka.sasl.mechanism }}
+            {{- if regexFind "scram-sha-512" .Values.kafka.sasl.enabledMechanisms }}
             echo "sasl.mechanism=SCRAM-SHA-512" >> /tmp/config.properties
+            {{- else if regexFind "scram-sha-256" .Values.kafka.sasl.enabledMechanisms }}
+            echo "sasl.mechanism=SCRAM-SHA-256" >> /tmp/config.properties
             {{- else }}
             echo "sasl.mechanism=PLAIN" >> /tmp/config.properties
             {{- end }}
