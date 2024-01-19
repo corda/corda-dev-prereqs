@@ -3,6 +3,12 @@
 The contents of this repository can be used to install the Kafka and PostgreSQL pre-requisites for Corda 5 development.
 The auto-generated [charts/corda-dev/README.md](README.md) contains details of the configurable values.
 
+## Quick Start
+
+There is a script in the base directory of this repo called `install.sh` which fetches all the dependencies, builds and tests the Corda Dev chart, and installs Corda using the prerequisites from the Corda Dev installation.
+
+In order to pull the Corda images, you will need to have the `CORDA_ARTIFACTORY_USERNAME` and `CORDA_ARTIFACTORY_PASSWORD` environment variables set.
+
 ## Installation from source
 
 Assuming [helm](https://helm.sh/) with a version greater than 3.7 is installed, the chart may be used a follows.
