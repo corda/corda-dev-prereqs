@@ -20,7 +20,7 @@ pipeline {
     agent {
         docker {
             image 'build-zulu-openjdk:11'
-            label 'docker'
+            label 'docker-private-network'
             registryUrl 'https://engineering-docker.software.r3.com/'
             registryCredentialsId 'artifactory-credentials'
             // Used to mount storage from the host as a volume to persist the cache between builds
@@ -31,7 +31,7 @@ pipeline {
     }
 
     environment {
-        KUBECONFIG = credentials("e2e-tests-credentials")
+        KUBECONFIG = credentials("kubernetes-eks-e2e-01-credentials")
         CORDA_REVISION = "${env.GIT_COMMIT}"
         CHART_VERSION = chartVersion()
         NAMESPACE = "run-${UUID.randomUUID().toString()}"
